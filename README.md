@@ -1,4 +1,4 @@
-# KatBot MTProto-Nodejs v0.1 (ALPHA TESTING)
+# Managing Client
 
 ## About
 Telegram client for maganing groups based on MTProto-Nodejs [**telegram-mtproto**](https://github.com/zerobias/telegram-mtproto) library with [**mtproto-storage-fs**](https://www.npmjs.com/package/mtproto-storage-fs)
