@@ -45,11 +45,12 @@ touch .env
 Once the file is created, just open it and past the following environment variables with their respective values that you own, just remember that those keys are related to you and must not be shared with anyone else, remember to always have this file in your .gitignore so that way you do not push it accidentally. Your .env file must be something like this:
 
 ```js
-BOT_TOKEN = "123456789:ABC_****"; // Your telegram bot token
-HOST = "https://your.domain"; // Pay attention that your server must have SSL certificate and provide https connection!
-BOT_NAME = "userNameOfBot"; // Without "@"
-API_HASH = "1eaf50c2ecs01fuidb26c1077418d5b"; // Take it easy, this hash is invalid
-API_ID = /\d\d\d\d\d\d/;
+BOT_TOKEN = "123456789:ABC_****" // Your telegram bot token
+HOST = "https://your.domain" // Pay attention that your server must have SSL certificate and provide https connection!
+BOT_NAME = "userNameOfBot" // Without "@"
+API_HASH = "1eaf50c2ecs01fuidb26c1077418d5b" // Take it easy, this hash is invalid
+API_ID = /\d\d\d\d\d\d/
+IS_DEV = true || false // Connect to dev or production server
 ```
 
 ## Running

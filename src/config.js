@@ -36,6 +36,6 @@ exports.MTProtoConfig = {
   },
 
   server: {
-    dev: true
+    dev: process.env.IS_DEV
   }
 };
