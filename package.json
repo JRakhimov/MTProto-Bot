@@ -6,16 +6,21 @@
   "scripts": {
     "start": "node index.js",
     "format": "prettier --write \"**/*.{js,md}\"",
+    "pure-run": "rd /s /q \"storage\" && npm run start",
     "nodemon": "nodemon index.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "express": "^4.16.3",
     "mtproto-storage-fs": "^0.3.1",
+    "telegraf": "^3.21.2",
+    "telegraf-ratelimit": "^2.0.0",
     "telegram-mtproto": "^2.2.8"
   },
   "devDependencies": {
     "dotenv": "^6.0.0",
+    "nodemon": "^1.18.3",
     "prettier": "^1.13.6"
   }
 }
