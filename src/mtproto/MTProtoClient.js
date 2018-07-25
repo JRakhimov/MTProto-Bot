@@ -1,15 +1,14 @@
 "use strict";
 
-const { Storage } = require("mtproto-storage-fs");
 const { MTProto } = require("telegram-mtproto");
-
 const { MTProtoConfig } = require("../config");
+const { Storage } = require("./sessionSaver");
 
-const app = { storage: new Storage("../storage/storage.json") };
+const storage = new Storage({});
 const client = MTProto({
   server: MTProtoConfig.server,
   api: MTProtoConfig.api,
-  app
+  app: { storage }
 });
 
 class MTProtoClient {

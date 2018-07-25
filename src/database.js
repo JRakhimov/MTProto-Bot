@@ -1,11 +1,11 @@
-const admin = require("firebase-admin");
+const firebase = require("firebase-admin");
 
-const { firebase } = require("./config");
+const { firebaseConfig } = require("./config");
 const serviceAccount = require("../firebase.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${firebase.project_id}.firebaseio.com`
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
+  databaseURL: `https://${firebaseConfig.project_id}.firebaseio.com`
 });
 
-module.exports = admin.database();
+module.exports = firebase.database();

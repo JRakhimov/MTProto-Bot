@@ -36,8 +36,8 @@ exports.MTProtoConfig = {
   },
 
   server: {
-    dev: process.env.IS_DEV ? true : false
+    dev: process.env.IS_DEV ? true : false // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
   }
 };
 
-exports.firebase = {};
+exports.firebaseConfig = {};
