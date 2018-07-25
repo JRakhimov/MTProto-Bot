@@ -39,3 +39,5 @@ exports.MTProtoConfig = {
     dev: process.env.IS_DEV ? true : false
   }
 };
+
+exports.firebase = {};

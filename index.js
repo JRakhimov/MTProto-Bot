@@ -1,28 +1,30 @@
 "use strict";
 
 const Telegraf = require("telegraf"); // Telegraf Dependencies
-const session = require("telegraf/session");
 const rateLimit = require("telegraf-ratelimit");
+const firebaseSession = require("telegraf-session-firebase");
 
-const Express = require("express"); // Express
+const Express = require("express"); // Other Dependencies
 const app = Express();
 
 const MTProtoClient = require("./src/mtproto/MTProtoClient"); // Local Dependencies
 const botHelper = require("./src/bot/modules/botHelper");
 const scenes = require("./src/bot/scenes/scenes");
 const { botConfig } = require("./src/config");
+const database = require("./src/database");
 
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 const MTProto = new MTProtoClient(); // MTProto init
 
-bot.use(session());
 bot.use(Telegraf.log());
 bot.context.MTProto = MTProto;
 bot.use(scenes.stage.middleware());
 bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
+bot.use(firebaseSession(database.ref("sessions")));
 
 bot.start(ctx => {
+  ctx.session.from = ctx.from;
   ctx.reply("Welcome!");
 });
 
