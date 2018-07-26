@@ -34,7 +34,7 @@ bot.hears([/auth/gi, /\/auth/gi], ctx => {
 });
 
 bot.hears("dialogs", async ctx => {
-  console.log(await ctx.MTProto.getDiaolgs(0, 30));
+  console.log(await ctx.MTProto.messagesGetDialogs(0, 30));
   ctx.reply("Dialogs is in your console");
 });
 

@@ -5,11 +5,11 @@ const { MTProtoConfig } = require("../config");
 const { Storage } = require("./Storage");
 
 class MTProtoClient {
-  constructor(app_id, hash, data = {}) {
-    this.__storage = new Storage(data);
+  constructor(api_id, api_hash) {
+    this.__storage = new Storage();
 
-    this.__app_id = app_id;
-    this.__hash = hash;
+    this.__api_id = api_id;
+    this.__api_hash = api_hash;
 
     this.__phone_code_hash = null;
     this.__phone = null;
@@ -21,12 +21,12 @@ class MTProtoClient {
     });
   }
 
-  async getAuthCode(phone) {
+  async authSendCode(phone) {
     const config = {
       phone_number: phone,
       current_number: false,
-      api_id: this.__app_id,
-      api_hash: this.__hash
+      api_id: this.__api_id,
+      api_hash: this.__api_hash
     };
 
     const { phone_code_hash } = await this.__connector("auth.sendCode", config);
@@ -37,19 +37,19 @@ class MTProtoClient {
     return phone_code_hash;
   }
 
-  async signIn(code) {
+  async authSignIn(code) {
     const config = {
       phone_code: code,
       phone_number: this.__phone,
       phone_code_hash: this.__phone_code_hash
     };
 
-    const { user } = await this.__connector("auth.signIn", config);
+    const { user } = await this.__connector("auth.authSignIn", config);
 
     return user;
   }
 
-  async getDiaolgs(offset, limit) {
+  async messagesGetDialogs(offset, limit) {
     const config = {
       offset,
       limit

@@ -7,7 +7,7 @@ const saveCode = new Composer();
 saveCode.on("text", async ctx => {
   ctx.reply("Signing in...");
 
-  const user = await ctx.MTProto.signIn(ctx.message.text);
+  const user = await ctx.MTProto.authSignIn(ctx.message.text);
 
   ctx.reply(`Signed in as ${user.username}`);
 
