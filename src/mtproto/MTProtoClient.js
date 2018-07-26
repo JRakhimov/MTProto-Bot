@@ -7,8 +7,7 @@ const { Storage } = require("./sessionSaver");
 const storage = new Storage({});
 const client = MTProto({
   server: MTProtoConfig.server,
-  api: MTProtoConfig.api,
-  app: { storage }
+  api: MTProtoConfig.api
 });
 
 class MTProtoClient {
@@ -31,6 +30,13 @@ class MTProtoClient {
     });
 
     return await user;
+  }
+
+  async getDiaolgs() {
+    return await client("messages.getDialogs", {
+      offset: 0,
+      limit: 30
+    });
   }
 }
 

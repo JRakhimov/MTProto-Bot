@@ -6,12 +6,14 @@ class FirebaseStorage {
   constructor(data) {
     if (data) {
       this.path = "/MTProto/";
-      database.ref(this.path).set(data);
+      database.ref(this.path).set({dc: 2});
     }
   }
 
-  get(key) {
-    return Promise.resolve(this.getFromDB()[key]);
+  async get(key) {
+    const obj = (await database.ref(this.path).once("value")).val();
+    console.log(obj)
+    return Promise.resolve(obj[key]);
   }
 
   set(key, val) {
@@ -21,8 +23,8 @@ class FirebaseStorage {
     return Promise.resolve();
   }
 
-  remove(...keys) {
-    const oldData = this.getFromDB();
+  async remove(...keys) {
+    const oldData = (await database.ref(this.path).once("value")).val();
     const results = keys.map(key => delete oldData[key]);
     database.ref(this.path).update(results);
     return Promise.resolve(results);
@@ -31,10 +33,6 @@ class FirebaseStorage {
   clear() {
     database.ref(this.path).remove();
     return Promise.resolve();
-  }
-
-  getFromDB() {
-    return Promise.await(database.ref(this.path).once("value")).val();
   }
 }
 

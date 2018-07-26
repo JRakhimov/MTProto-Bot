@@ -16,12 +16,13 @@ const database = require("./src/database");
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 const MTProto = new MTProtoClient(); // MTProto init
 
-bot.use(Telegraf.log());
-bot.context.MTProto = MTProto;
-bot.use(scenes.stage.middleware());
-bot.use(rateLimit(botConfig.rateLimit));
-bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use(firebaseSession(database.ref("sessions")));
+bot.telegram.setWebhook(`${botConfig.url}/bot`);
+bot.use(rateLimit(botConfig.rateLimit));
+bot.use(scenes.stage.middleware());
+bot.context.database = database;
+bot.context.MTProto = MTProto;
+bot.use(Telegraf.log());
 
 bot.start(ctx => {
   ctx.session.from = ctx.from;
