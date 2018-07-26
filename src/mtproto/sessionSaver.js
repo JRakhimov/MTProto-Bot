@@ -6,13 +6,17 @@ class FirebaseStorage {
   constructor(data) {
     if (data) {
       this.path = "/MTProto/";
-      database.ref(this.path).set({dc: 2});
+      database.ref(this.path).set(data);
     }
   }
 
   async get(key) {
     const obj = (await database.ref(this.path).once("value")).val();
-    console.log(obj)
+    if (obj == null) {
+      console.log(key, ":", undefined);
+      return Promise.resolve(undefined);
+    }
+
     return Promise.resolve(obj[key]);
   }
 
@@ -36,4 +40,46 @@ class FirebaseStorage {
   }
 }
 
-exports.Storage = FirebaseStorage;
+class Storage {
+  constructor(data) {
+    this.store = new Map();
+    if (data) {
+      for (let key in data) {
+        this.store.set(key, data[key])
+      }
+      console.log(this.store)
+    }
+  }
+
+  get(key) {
+    console.log(key);
+    console.log(this.store.get(key));
+    return Promise.resolve(this.store.get(key))
+  }
+
+  set(key, val) {
+    this.store.set(key, val)
+    return Promise.resolve()
+  }
+
+  remove(...keys) {
+    const results = keys.map(e => this.store.delete(e))
+    return Promise.resolve(results)
+  }
+
+  clear() {
+    this.store.clear()
+    return Promise.resolve()
+  }
+
+  storeToJSON() {
+    const obj = {}
+    this.store.forEach(function (value, key) {
+      obj[key] = value
+    })
+
+    return obj
+  }
+}
+
+exports.Storage = Storage;

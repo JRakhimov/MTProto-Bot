@@ -4,39 +4,59 @@ const { MTProto } = require("telegram-mtproto");
 const { MTProtoConfig } = require("../config");
 const { Storage } = require("./sessionSaver");
 
-const storage = new Storage({});
-const client = MTProto({
-  server: MTProtoConfig.server,
-  api: MTProtoConfig.api
-});
-
 class MTProtoClient {
-  async sendCode(phoneNumber) {
-    const { phone_code_hash } = await client("auth.sendCode", {
-      phone_number: phoneNumber,
-      current_number: false,
-      api_id: MTProtoConfig.api_id,
-      api_hash: MTProtoConfig.api_hash
-    });
+  constructor (app_id, hash, data = {}) {
+    this.__storage = new Storage(data);
 
+    this.__app_id = app_id;
+    this.__hash = hash;
+
+    this.__phone_code_hash = null;
+    this.__phone = null;
+
+    this.__connector = MTProto({
+      app: { storage: this.__storage },
+      server: MTProtoConfig.server,
+      api: MTProtoConfig.api,
+    });
+  }
+
+  async getAuthCode (phone) {
+    const config = {
+      phone_number: phone,
+      current_number: false,
+      api_id: this.__app_id,
+      api_hash: this.__hash
+    };
+
+    const { phone_code_hash } = await this.__connector('auth.sendCode', config);
+    console.log(this.__storage);
+    this.__phone_code_hash = phone_code_hash;
+    this.__phone = phone;
     return await phone_code_hash;
   }
 
-  async signIn(phoneNumber, code, phoneCodeHash) {
-    const { user } = await client("auth.signIn", {
-      phone_number: phoneNumber,
-      phone_code_hash: phoneCodeHash,
-      phone_code: code
-    });
+  async signIn (code) {
+    const config = {
+      phone_number: this.__phone,
+      phone_code_hash: this.__phone_code_hash,
+      phone_code: code.toString()
+    };
 
-    return await user;
+    const response = await this.__connector('auth.signIn', config);
+    
+    return await response;
   }
 
-  async getDiaolgs() {
-    return await client("messages.getDialogs", {
-      offset: 0,
-      limit: 30
-    });
+  async getDiaolgs(offset, limit) {
+    const config = {
+      offset,
+      limit
+    };
+
+    const response = await this.__connector("messages.getDialogs", config);
+
+    return await response;
   }
 }
 
