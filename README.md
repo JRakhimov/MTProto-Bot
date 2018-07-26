@@ -1,4 +1,4 @@
-# Managing Client
+# MTProto-Bot
 
 ## About
 

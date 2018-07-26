@@ -1,8 +1,42 @@
 "use strict";
 
+const Markup = require('telegraf/markup');
+const Extra = require('telegraf/extra');
+
 const { botConfig } = require("../../config");
 
 const botHelper = {
+  directReply: (ctx, msgText) => {
+    return ctx.telegram.sendMessage(ctx.chat.id, msgText, {
+      parse_mode: "HTML",
+      reply_to_message_id: ctx.update.message.message_id
+    });
+  },
+
+  mainKeyboard: (ctx, msgText) => {
+    return ctx.reply(
+      msgText,
+      Extra.HTML().markup(
+        Markup.keyboard([
+          ["👨‍👨‍👧‍👦 Groups"],
+          ["👥 Contacts", "👤 New contact"],
+          ["🤓 Profile", "😿 Log Out"]
+        ]).resize()
+      )
+    );
+  },
+
+  authKeyboard: (ctx, msgText) => {
+    return ctx.reply(
+      msgText,
+      Extra.HTML().markup(
+        Markup.oneTime()
+          .keyboard([["🎫 Log in"]])
+          .resize()
+      )
+    );
+  },
+
   toAllAdmins: (ctx, msgText) => {
     Object.keys(botConfig.admins).forEach(admin => {
       ctx.telegram.sendMessage(botConfig.admins[admin], msgText, Extra.HTML());
