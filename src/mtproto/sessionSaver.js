@@ -12,8 +12,8 @@ class FirebaseStorage {
 
   async get(key) {
     const obj = (await database.ref(this.path).once("value")).val();
+
     if (obj == null) {
-      console.log(key, ":", undefined);
       return Promise.resolve(undefined);
     }
 
@@ -82,4 +82,4 @@ class Storage {
   }
 }
 
-exports.Storage = Storage;
+exports.Storage = FirebaseStorage;

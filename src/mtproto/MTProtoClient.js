@@ -30,22 +30,22 @@ class MTProtoClient {
     };
 
     const { phone_code_hash } = await this.__connector('auth.sendCode', config);
-    console.log(this.__storage);
+
     this.__phone_code_hash = phone_code_hash;
     this.__phone = phone;
-    return await phone_code_hash;
+    return phone_code_hash;
   }
 
   async signIn (code) {
     const config = {
       phone_number: this.__phone,
       phone_code_hash: this.__phone_code_hash,
-      phone_code: code.toString()
+      phone_code: code
     };
 
-    const response = await this.__connector('auth.signIn', config);
+    const { user } = await this.__connector('auth.signIn', config);
     
-    return await response;
+    return user;
   }
 
   async getDiaolgs(offset, limit) {
@@ -56,7 +56,7 @@ class MTProtoClient {
 
     const response = await this.__connector("messages.getDialogs", config);
 
-    return await response;
+    return response;
   }
 }
 

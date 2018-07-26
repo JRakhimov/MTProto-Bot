@@ -33,6 +33,15 @@ bot.hears([/auth/gi, /\/auth/gi], ctx => {
   ctx.scene.enter("authScene");
 });
 
+bot.hears("test", async ctx => {
+  console.log(await ctx.MTProto.getDiaolgs(0, 30))
+  ctx.reply("test")
+})
+
+bot.hears([/\/leave/gi, /leave/gi], ctx => {
+  ctx.scene.leave()
+})
+
 bot.catch(err => {
   botHelper.errHandler(bot, err);
 });
