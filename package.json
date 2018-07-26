@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node firebase-generator.js && node index.js",
-    "format": "prettier --write \"**/*.{js,md}\"",
-    "pure-run": "rd /s /q \"storage\" && npm run start",
+    "format": "prettier --write \"**/*.js\"",
     "nodemon": "nodemon index.js"
   },
   "author": "",
@@ -14,7 +13,6 @@
   "dependencies": {
     "express": "^4.16.3",
     "firebase-admin": "^5.13.1",
-    "mtproto-storage-fs": "^0.3.1",
     "telegraf": "^3.21.2",
     "telegraf-ratelimit": "^2.0.0",
     "telegraf-session-firebase": "0.0.1",

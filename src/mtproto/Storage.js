@@ -4,10 +4,17 @@ const database = require("../database");
 
 class FirebaseStorage {
   constructor(data) {
-    if (data) {
-      this.path = "/MTProto/";
-      database.ref(this.path).set(data);
-    }
+    this.path = "/MTProto/";
+    database
+      .ref(this.path)
+      .once("value")
+      .then(value => {
+        if (value.val() == null) {
+          database.ref(this.path).set(data);
+        } else {
+          database.ref(this.path).set(value.val());
+        }
+      });
   }
 
   async get(key) {
@@ -45,40 +52,40 @@ class Storage {
     this.store = new Map();
     if (data) {
       for (let key in data) {
-        this.store.set(key, data[key])
+        this.store.set(key, data[key]);
       }
-      console.log(this.store)
+      console.log(this.store);
     }
   }
 
   get(key) {
     console.log(key);
     console.log(this.store.get(key));
-    return Promise.resolve(this.store.get(key))
+    return Promise.resolve(this.store.get(key));
   }
 
   set(key, val) {
-    this.store.set(key, val)
-    return Promise.resolve()
+    this.store.set(key, val);
+    return Promise.resolve();
   }
 
   remove(...keys) {
-    const results = keys.map(e => this.store.delete(e))
-    return Promise.resolve(results)
+    const results = keys.map(e => this.store.delete(e));
+    return Promise.resolve(results);
   }
 
   clear() {
-    this.store.clear()
-    return Promise.resolve()
+    this.store.clear();
+    return Promise.resolve();
   }
 
   storeToJSON() {
-    const obj = {}
-    this.store.forEach(function (value, key) {
-      obj[key] = value
-    })
+    const obj = {};
+    this.store.forEach(function(value, key) {
+      obj[key] = value;
+    });
 
-    return obj
+    return obj;
   }
 }
 
