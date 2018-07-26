@@ -8,13 +8,13 @@ const Express = require("express"); // Other Dependencies
 const app = Express();
 
 const MTProtoClient = require("./src/mtproto/MTProtoClient"); // Local Dependencies
+const { botConfig, MTProtoConfig } = require("./src/config");
 const botHelper = require("./src/bot/modules/botHelper");
 const scenes = require("./src/bot/scenes/scenes");
-const { botConfig } = require("./src/config");
 const database = require("./src/database");
 
+const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
-const MTProto = new MTProtoClient(); // MTProto init
 
 bot.use(firebaseSession(database.ref("sessions")));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
@@ -31,6 +31,11 @@ bot.start(ctx => {
 
 bot.hears([/auth/gi, /\/auth/gi], ctx => {
   ctx.scene.enter("authScene");
+});
+
+bot.hears("dialogs", async ctx => {
+  console.log(await ctx.MTProto.getDiaolgs(0, 30));
+  ctx.reply("Dialogs is in your console");
 });
 
 bot.catch(err => {
