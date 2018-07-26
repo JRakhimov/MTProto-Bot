@@ -8,8 +8,8 @@ class MTProtoClient {
   constructor(api_id, api_hash) {
     this.__storage = new Storage();
 
-    this.__api_id = api_id;
     this.__api_hash = api_hash;
+    this.__api_id = api_id;
 
     this.__phone_code_hash = null;
     this.__phone = null;
