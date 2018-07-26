@@ -19,14 +19,20 @@ bot.use(rateLimit(botConfig.rateLimit));
 bot.use(scenes.stage.middleware());
 bot.context.database = database;
 bot.context.MTProto = MTProto;
+bot.context.helper = botHelper;
 bot.use(Telegraf.log());
 
-bot.start(ctx => {
+bot.start(async ctx => {
   ctx.session.from = ctx.from;
-  ctx.reply("Welcome!");
+  const authData = (await database.ref(MTProtoConfig.sessionPath).once("value")).val();
+  if (authData != null) {
+    return ctx.helper.mainKeyboard(ctx, "Welcome!");
+  } else {
+    return ctx.helper.authKeyboard(ctx, "Pls, log in!")
+  }
 });
 
-bot.hears([/auth/gi, /\/auth/gi], ctx => {
+bot.hears("🎫 Log in", ctx => {
   ctx.scene.enter("authScene");
 });
 

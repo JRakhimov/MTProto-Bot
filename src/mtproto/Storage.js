@@ -1,10 +1,11 @@
 "use strict";
 
 const database = require("../database");
+const { MTProtoConfig } = require("../config")
 
 class FirebaseStorage {
   constructor() {
-    this.path = "/MTProto/";
+    this.path = MTProtoConfig.sessionPath;
 
     database
       .ref(this.path)

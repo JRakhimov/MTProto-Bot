@@ -44,7 +44,7 @@ class MTProtoClient {
       phone_code_hash: this.__phone_code_hash
     };
 
-    const { user } = await this.__connector("auth.authSignIn", config);
+    const { user } = await this.__connector("auth.signIn", config);
 
     return user;
   }

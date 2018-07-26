@@ -9,7 +9,7 @@ saveCode.on("text", async ctx => {
 
   const user = await ctx.MTProto.authSignIn(ctx.message.text);
 
-  ctx.reply(`Signed in as ${user.username}`);
+  ctx.helper.mainKeyboard(ctx, `Signed in as ${user.username}`);
 
   ctx.database.ref(`sessions/${ctx.chat.id}/${ctx.chat.id}/__scenes`).remove();
   return ctx.scene.leave();
