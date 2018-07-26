@@ -6,7 +6,9 @@ const saveNumber = new Composer();
 
 saveNumber.on("text", async ctx => {
   await ctx.MTProto.getAuthCode(ctx.message.text);
-  await ctx.reply("Code:");
+
+  ctx.reply("Code:");
+
   return ctx.wizard.next();
 });
 

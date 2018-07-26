@@ -5,16 +5,14 @@ const database = require("../database");
 class FirebaseStorage {
   constructor(data) {
     this.path = "/MTProto/";
+
     database
       .ref(this.path)
       .once("value")
-      .then(value => {
-        if (value.val() == null) {
-          database.ref(this.path).set(data);
-        } else {
-          database.ref(this.path).set(value.val());
-        }
-      });
+      .then(value => database
+        .ref(this.path)
+        .set((value.val() == null) ? data : value.val())
+      );
   }
 
   async get(key) {
@@ -30,23 +28,30 @@ class FirebaseStorage {
   set(key, val) {
     const updates = {};
     updates[key] = val;
+
     database.ref(this.path).update(updates);
+
     return Promise.resolve();
   }
 
   async remove(...keys) {
     const oldData = (await database.ref(this.path).once("value")).val();
+
     const results = keys.map(key => delete oldData[key]);
+    
     database.ref(this.path).update(results);
+    
     return Promise.resolve(results);
   }
 
   clear() {
     database.ref(this.path).remove();
+
     return Promise.resolve();
   }
 }
 
+// Testing Storage
 class Storage {
   constructor(data) {
     this.store = new Map();

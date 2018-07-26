@@ -33,14 +33,15 @@ class MTProtoClient {
 
     this.__phone_code_hash = phone_code_hash;
     this.__phone = phone;
+
     return phone_code_hash;
   }
 
   async signIn(code) {
     const config = {
+      phone_code: code,
       phone_number: this.__phone,
-      phone_code_hash: this.__phone_code_hash,
-      phone_code: code
+      phone_code_hash: this.__phone_code_hash
     };
 
     const { user } = await this.__connector("auth.signIn", config);
