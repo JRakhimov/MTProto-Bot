@@ -14,20 +14,20 @@ Telegram client for maganing groups based on [**MTProto-Nodejs**](https://github
 
 You will need to generate a Telegram bot API key and that it's easy, just follow [this](https://core.telegram.org/bots#3-how-do-i-create-a-bot) step-by-step. Also you should create your Telegram Client Application and get `api_id` and `api_hash` from here: https://my.telegram.org/
 
-![where_to_get_app_config](https://raw.githubusercontent.com/JRakhimov/Managing-Client-Telegram/master/images/where_to_get_app_config.png)
+![where_to_get_app_config](https://raw.githubusercontent.com/JRakhimov/MTProto-Bot/master/images/where_to_get_app_config.png)
 
 ### Now the environment part...
 
 Install npm and Node.js on your machine, open a terminal then navigate to the folder where you want your project to be then run this command:
 
 ```bash
-git clone https://github.com/JRakhimov/Managing-Client-Telegram.git
+git clone https://github.com/JRakhimov/MTProto-Bot.git
 ```
 
 You should see something like this:
 
 ```bash
-Cloning into 'Managing-Client-Telegram'...
+Cloning into 'MTProto-Bot'...
 remote: Counting objects: 17, done.
 remote: Compressing objects: 100% (15/15), done.
 remote: Total 17 (delta 3), reused 12 (delta 2), pack-reused 0
@@ -63,7 +63,7 @@ npm install ngrok -g
 
 Then just type in your terminal `ngrok http 3000`
 
-![get_host_using_ngrok](https://raw.githubusercontent.com/JRakhimov/Managing-Client-Telegram/master/images/get_host_using_ngrok.png)
+![get_host_using_ngrok](https://raw.githubusercontent.com/JRakhimov/MTProto-Bot/master/images/get_host_using_ngrok.png)
 
 Finally this https url will be your host, and you can add this to your .env
 
