@@ -52,7 +52,7 @@ const botHelper = {
         listOfGroups.push([
           Markup.callbackButton(
             `${chat.title} (${chat.participants_count})`,
-            `group:${chat.title}:${chat.id}`
+            `group|${chat.title}|${chat.id}`
           )
         ]);
       }
