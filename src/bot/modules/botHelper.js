@@ -61,6 +61,44 @@ const botHelper = {
     return listOfGroups;
   },
 
+  contactsInlineBtns: async ctx => {
+    const { contacts } = await ctx.MTProto.contactsGetContacts();
+    const contactsList = [];
+
+    contacts.forEach(contact => contactsList.push(contact.user_id));
+
+    const { users } = await ctx.MTProto.contactsGetContacts(
+      contactsList.join(",")
+    );
+    const DContacts = [];
+    const DContactsKeyboard = [];
+
+    users.forEach(DContact => {
+      if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
+        DContacts.push({
+          id: DContact.id,
+          access_hash: DContact.access_hash,
+          first_name: DContact.first_name,
+          phone: DContact.phone
+        });
+
+        DContactsKeyboard.push([
+          Markup.callbackButton(
+            DContact.first_name,
+            `contact|${DContact.first_name}|${DContact.id}`
+          )
+        ]);
+      }
+    });
+
+    ctx.database.ref("/MTProtoAccount/DContacts").set(DContacts);
+
+    return {
+      DContacts,
+      DContactsKeyboard
+    };
+  },
+
   isAdmin: chatID => {
     return Object.values(botConfig.admins).includes(chatID);
   },

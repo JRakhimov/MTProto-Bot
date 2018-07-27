@@ -23,7 +23,7 @@ saveCode.on("text", async ctx => {
 
   ctx.database.ref(`sessions/${ctx.chat.id}/${ctx.chat.id}/__scenes`).set(null);
 
-  ctx.database.ref("/MTProtoAccount/").set(userData);
+  ctx.database.ref("/MTProtoAccount/Me").set(userData);
 
   return ctx.scene.leave();
 });

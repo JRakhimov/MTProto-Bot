@@ -4,6 +4,8 @@ const { MTProto } = require("telegram-mtproto");
 const { MTProtoConfig } = require("../config");
 const { Storage } = require("./Storage");
 
+const md5 = require("md5");
+
 class MTProtoClient {
   constructor(api_id, api_hash) {
     this.__storage = new Storage();
@@ -60,23 +62,31 @@ class MTProtoClient {
     return response;
   }
 
+  async contactsGetContacts(contactsList) {
+    const config = contactsList ? { hash: md5(contactsList).hash } : {};
+
+    const response = await this.__connector("contacts.getContacts", config);
+
+    return response;
+  }
+
   async contactsImportContacts(contactInfo, replace, prefix = "") {
-    // inputPhoneContact is a constructor https://github.com/zerobias/telegram-mtproto/issues/76
+    // inputPhoneContact is a constructor - https://github.com/zerobias/telegram-mtproto/issues/76
     const inputPhoneContact = {
       _: "inputPhoneContact",
       client_id: contactInfo.user_id,
       phone: contactInfo.phone_number,
       first_name: prefix + contactInfo.first_name
-    }
+    };
 
     const config = {
       contacts: [inputPhoneContact],
       replace
     };
 
-    const response = await this.__connector("contacts.importContacts", config)
+    const response = await this.__connector("contacts.importContacts", config);
 
-    return response
+    return response;
   }
 }
 

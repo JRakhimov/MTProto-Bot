@@ -57,12 +57,22 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   );
 });
 
+bot.hears("👥 Contacts", async ctx => {
+  const { DContactsKeyboard } = await ctx.helper.contactsInlineBtns(ctx);
+
+  ctx.helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
+});
+
 bot.on("contact", async ctx => {
-  const response = await ctx.MTProto.contactsImportContacts(ctx.message.contact, true, "D:CODE ");
+  const response = await ctx.MTProto.contactsImportContacts(
+    ctx.message.contact,
+    true,
+    "D:CODE "
+  );
 
   console.log(response);
 
-  ctx.reply("Console")
+  ctx.reply("Console");
 });
 
 bot.catch(err => {
