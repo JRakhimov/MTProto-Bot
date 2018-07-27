@@ -59,6 +59,25 @@ class MTProtoClient {
 
     return response;
   }
+
+  async contactsImportContacts(contactInfo, replace, prefix = "") {
+    // inputPhoneContact is a constructor https://github.com/zerobias/telegram-mtproto/issues/76
+    const inputPhoneContact = {
+      _: "inputPhoneContact",
+      client_id: contactInfo.user_id,
+      phone: contactInfo.phone_number,
+      first_name: prefix + contactInfo.first_name
+    }
+
+    const config = {
+      contacts: [inputPhoneContact],
+      replace
+    };
+
+    const response = await this.__connector("contacts.importContacts", config)
+
+    return response
+  }
 }
 
 module.exports = MTProtoClient;

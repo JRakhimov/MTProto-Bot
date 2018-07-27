@@ -57,6 +57,14 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   );
 });
 
+bot.on("contact", async ctx => {
+  const response = await ctx.MTProto.contactsImportContacts(ctx.message.contact, true, "D:CODE ");
+
+  console.log(response);
+
+  ctx.reply("Console")
+});
+
 bot.catch(err => {
   botHelper.errHandler(bot, err);
 });
