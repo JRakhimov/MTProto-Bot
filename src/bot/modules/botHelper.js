@@ -1,7 +1,7 @@
 "use strict";
 
-const Markup = require('telegraf/markup');
-const Extra = require('telegraf/extra');
+const Markup = require("telegraf/markup");
+const Extra = require("telegraf/extra");
 
 const { botConfig } = require("../../config");
 
@@ -11,6 +11,13 @@ const botHelper = {
       parse_mode: "HTML",
       reply_to_message_id: ctx.update.message.message_id
     });
+  },
+
+  replyWithInline: (ctx, msgText, keyboard) => {
+    return ctx.reply(
+      msgText,
+      Extra.HTML().markup(Markup.inlineKeyboard(keyboard))
+    );
   },
 
   mainKeyboard: (ctx, msgText) => {
@@ -37,8 +44,25 @@ const botHelper = {
     );
   },
 
-  isAdmin: (chatID) => {
-    return Object.values(botConfig.admins).includes(chatID)
+  groupsInlineBtns: chats => {
+    const listOfGroups = [];
+
+    chats.forEach(chat => {
+      if (chat.title.match(/D:CODE/) == "D:CODE") {
+        listOfGroups.push([
+          Markup.callbackButton(
+            `${chat.title} (${chat.participants_count})`,
+            `group:${chat.title}:${chat.id}`
+          )
+        ]);
+      }
+    });
+
+    return listOfGroups;
+  },
+
+  isAdmin: chatID => {
+    return Object.values(botConfig.admins).includes(chatID);
   },
 
   toAllAdmins: (ctx, msgText) => {

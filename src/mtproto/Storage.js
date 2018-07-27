@@ -1,7 +1,7 @@
 "use strict";
 
 const database = require("../database");
-const { MTProtoConfig } = require("../config")
+const { MTProtoConfig } = require("../config");
 
 class FirebaseStorage {
   constructor() {

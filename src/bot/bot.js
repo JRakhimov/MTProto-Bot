@@ -23,31 +23,38 @@ bot.context.helper = botHelper;
 bot.use(Telegraf.log());
 
 bot.use(async (ctx, next) => {
-  const authData = (await database.ref(MTProtoConfig.sessionPath).once("value")).val();
+  const authData = (await database
+    .ref(MTProtoConfig.sessionPath)
+    .once("value")).val();
 
   if (ctx.helper.isAdmin(ctx.chat.id)) {
     if (authData != null) {
-      ctx.helper.mainKeyboard(ctx, "Welcome!");
-      await next(ctx)
+      await next(ctx);
     } else if (ctx.message.text !== "🎫 Log in") {
       ctx.helper.authKeyboard(ctx, "Pls, log in!");
     } else {
-      await next(ctx)
+      await next(ctx);
     }
-  };
+  }
 });
 
 bot.start(async ctx => {
   ctx.session.from = ctx.from;
+  ctx.helper.mainKeyboard(ctx, "Welcome!");
 });
 
 bot.hears("🎫 Log in", ctx => {
   ctx.scene.enter("authScene");
 });
 
-bot.hears("dialogs", async ctx => {
-  console.log(await ctx.MTProto.messagesGetDialogs(0, 30));
-  ctx.reply("Dialogs is in your console");
+bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
+  const { chats } = await ctx.MTProto.messagesGetDialogs(0, 30);
+
+  ctx.helper.replyWithInline(
+    ctx,
+    "Here is your groups:",
+    ctx.helper.groupsInlineBtns(chats)
+  );
 });
 
 bot.catch(err => {

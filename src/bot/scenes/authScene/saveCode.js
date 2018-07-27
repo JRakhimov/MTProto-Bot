@@ -17,7 +17,7 @@ saveCode.on("text", async ctx => {
     photo: user.photo || "",
     phone: user.phone,
     id: user.id
-  }
+  };
 
   ctx.helper.mainKeyboard(ctx, `Signed in as ${userData.username}`);
 
