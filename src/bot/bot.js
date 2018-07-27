@@ -48,17 +48,17 @@ bot.hears("🎫 Log in", ctx => {
 });
 
 bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
-  const { chats } = await ctx.MTProto.messagesGetDialogs(0, 30);
+  const { DGroupsKeyboard } = await ctx.helper.DGroups(ctx, 0, 50);
 
   ctx.helper.replyWithInline(
     ctx,
     "Here is your groups:",
-    ctx.helper.groupsInlineBtns(chats)
+    DGroupsKeyboard
   );
 });
 
 bot.hears("👥 Contacts", async ctx => {
-  const { DContactsKeyboard } = await ctx.helper.contactsInlineBtns(ctx);
+  const { DContactsKeyboard } = await ctx.helper.DContacts(ctx);
 
   ctx.helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
 });
@@ -74,6 +74,24 @@ bot.on("contact", async ctx => {
 
   ctx.reply("Console");
 });
+
+bot.action(/contact|/, async (ctx) => {
+  const callbackData = {
+    name: (ctx.match.input).split('|')[1], // D:CODE RJ
+    user_id: (ctx.match.input).split('|')[2], // 127393
+    access_hash: (ctx.match.input).split('|')[3] // 2443773757594061248
+  }
+
+  ctx.answerCbQuery(callbackData.name)
+
+  const { DGroups } = await ctx.helper.DGroups(ctx, 0, 50);
+
+  console.log(DGroups)
+
+  DGroups.forEach(DGroup => {
+    ctx.MTProto.messagesAddChatUser(DGroup.id, callbackData.user_id, callbackData.access_hash)
+  });
+})
 
 bot.catch(err => {
   botHelper.errHandler(bot, err);

@@ -62,6 +62,24 @@ class MTProtoClient {
     return response;
   }
 
+  async messagesAddChatUser(chat_id, user_id, access_hash, fwd_limit = 50) {
+    const inputUser = {
+      _: "inputUser",
+      user_id,
+      access_hash
+    }
+
+    const config = {
+      chat_id,
+      user_id: inputUser,
+      fwd_limit
+    }
+
+    const response = await this.__connector("messages.addChatUser", config);
+
+    return response;
+  }
+
   async contactsGetContacts(contactsList) {
     const config = contactsList ? { hash: md5(contactsList).hash } : {};
 

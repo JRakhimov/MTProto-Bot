@@ -44,24 +44,37 @@ const botHelper = {
     );
   },
 
-  groupsInlineBtns: chats => {
-    const listOfGroups = [];
+  DGroups: async (ctx, offset, limit) => {
+    const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
+    const DGroups = [];
+    const DGroupsKeyboard = [];
 
-    chats.forEach(chat => {
-      if (chat.title.match(/D:CODE/) == "D:CODE") {
-        listOfGroups.push([
+    chats.forEach(DGroup => {
+      if (DGroup.title.match(/D:CODE/) == "D:CODE") {
+        DGroups.push({
+          id: DGroup.id,
+          title: DGroup.title,
+          participants_count: DGroup.participants_count
+        });
+
+        DGroupsKeyboard.push([
           Markup.callbackButton(
-            `${chat.title} (${chat.participants_count})`,
-            `group|${chat.title}|${chat.id}`
+            `${DGroup.title} (${DGroup.participants_count})`,
+            `group|${DGroup.title}|${DGroup.id}`
           )
         ]);
       }
     });
 
-    return listOfGroups;
+    ctx.database.ref("/MTProtoAccount/DGroups").set(DGroups);
+
+    return {
+      DGroups,
+      DGroupsKeyboard
+    };
   },
 
-  contactsInlineBtns: async ctx => {
+  DContacts: async ctx => {
     const { contacts } = await ctx.MTProto.contactsGetContacts();
     const contactsList = [];
 
@@ -85,7 +98,7 @@ const botHelper = {
         DContactsKeyboard.push([
           Markup.callbackButton(
             DContact.first_name,
-            `contact|${DContact.first_name}|${DContact.id}`
+            `contact|${DContact.first_name}|${DContact.id}|${DContact.access_hash}`
           )
         ]);
       }
