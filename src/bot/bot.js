@@ -22,14 +22,23 @@ bot.context.MTProto = MTProto;
 bot.context.helper = botHelper;
 bot.use(Telegraf.log());
 
+bot.use(async (ctx, next) => {
+  const authData = (await database.ref(MTProtoConfig.sessionPath).once("value")).val();
+
+  if (ctx.helper.isAdmin(ctx.chat.id)) {
+    if (authData != null) {
+      ctx.helper.mainKeyboard(ctx, "Welcome!");
+      await next(ctx)
+    } else if (ctx.message.text !== "🎫 Log in") {
+      ctx.helper.authKeyboard(ctx, "Pls, log in!");
+    } else {
+      await next(ctx)
+    }
+  };
+});
+
 bot.start(async ctx => {
   ctx.session.from = ctx.from;
-  const authData = (await database.ref(MTProtoConfig.sessionPath).once("value")).val();
-  if (authData != null) {
-    return ctx.helper.mainKeyboard(ctx, "Welcome!");
-  } else {
-    return ctx.helper.authKeyboard(ctx, "Pls, log in!")
-  }
 });
 
 bot.hears("🎫 Log in", ctx => {

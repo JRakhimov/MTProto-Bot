@@ -37,9 +37,13 @@ const botHelper = {
     );
   },
 
+  isAdmin: (chatID) => {
+    return Object.values(botConfig.admins).includes(chatID)
+  },
+
   toAllAdmins: (ctx, msgText) => {
-    Object.keys(botConfig.admins).forEach(admin => {
-      ctx.telegram.sendMessage(botConfig.admins[admin], msgText, Extra.HTML());
+    Object.values(botConfig.admins).forEach(adminChatID => {
+      ctx.telegram.sendMessage(adminChatID, msgText, Extra.HTML());
     });
   },
 
