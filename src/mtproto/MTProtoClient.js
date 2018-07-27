@@ -31,12 +31,12 @@ class MTProtoClient {
       api_hash: this.__api_hash
     };
 
-    const { phone_code_hash } = await this.__connector("auth.sendCode", config);
+    const response = await this.__connector("auth.sendCode", config);
 
-    this.__phone_code_hash = phone_code_hash;
+    this.__phone_code_hash = response.phone_code_hash;
     this.__phone = phone;
 
-    return phone_code_hash;
+    return response;
   }
 
   async authSignIn(code) {
@@ -46,9 +46,9 @@ class MTProtoClient {
       phone_code_hash: this.__phone_code_hash
     };
 
-    const { user } = await this.__connector("auth.signIn", config);
+    const response = await this.__connector("auth.signIn", config);
 
-    return user;
+    return response;
   }
 
   async messagesGetDialogs(offset, limit) {
@@ -67,13 +67,13 @@ class MTProtoClient {
       _: "inputUser",
       user_id,
       access_hash
-    }
+    };
 
     const config = {
       chat_id,
       user_id: inputUser,
       fwd_limit
-    }
+    };
 
     const response = await this.__connector("messages.addChatUser", config);
 
@@ -89,7 +89,6 @@ class MTProtoClient {
   }
 
   async contactsImportContacts(contactInfo, replace, prefix = "") {
-    // inputPhoneContact is a constructor - https://github.com/zerobias/telegram-mtproto/issues/76
     const inputPhoneContact = {
       _: "inputPhoneContact",
       client_id: contactInfo.user_id,
@@ -98,7 +97,7 @@ class MTProtoClient {
     };
 
     const config = {
-      contacts: [inputPhoneContact],
+      contacts: inputPhoneContact,
       replace
     };
 

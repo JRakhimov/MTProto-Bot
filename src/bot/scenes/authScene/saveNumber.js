@@ -4,8 +4,8 @@ const Composer = require("telegraf/composer");
 
 const saveNumber = new Composer();
 
-saveNumber.on("text", async ctx => {
-  await ctx.MTProto.authSendCode(ctx.message.text);
+saveNumber.on("text", ctx => {
+  ctx.MTProto.authSendCode(ctx.message.text);
 
   ctx.reply("Code:");
 

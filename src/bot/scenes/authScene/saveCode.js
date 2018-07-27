@@ -7,7 +7,7 @@ const saveCode = new Composer();
 saveCode.on("text", async ctx => {
   ctx.reply("Signing in...");
 
-  const user = await ctx.MTProto.authSignIn(ctx.message.text);
+  const { user } = await ctx.MTProto.authSignIn(ctx.message.text.split("_")[1]);
 
   const userData = {
     first_name: user.first_name || "",
@@ -19,11 +19,11 @@ saveCode.on("text", async ctx => {
     id: user.id
   };
 
-  ctx.helper.mainKeyboard(ctx, `Signed in as ${userData.username}`);
+  ctx.Helper.mainKeyboard(ctx, `Signed in as ${userData.username}`);
 
-  ctx.database.ref(`sessions/${ctx.chat.id}/${ctx.chat.id}/__scenes`).set(null);
+  ctx.Database.ref(`sessions/${ctx.chat.id}/${ctx.chat.id}/__scenes`).set(null);
 
-  ctx.database.ref("/MTProtoAccount/Me").set(userData);
+  ctx.Database.ref("/MTProtoAccount/Me").set(userData);
 
   return ctx.scene.leave();
 });

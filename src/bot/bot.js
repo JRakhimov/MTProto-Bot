@@ -1,8 +1,9 @@
 "use strict";
 
 const Telegraf = require("telegraf"); // Telegraf Dependencies
+const session = require("telegraf/session");
 const rateLimit = require("telegraf-ratelimit");
-const firebaseSession = require("telegraf-session-firebase");
+// const firebaseSession = require("telegraf-session-firebase");
 
 const MTProtoClient = require("../mtproto/MTProtoClient"); // Local Dependencies
 const { botConfig, MTProtoConfig } = require("../config");
@@ -13,25 +14,26 @@ const database = require("../database");
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 
-bot.use(firebaseSession(database.ref("BotSessions")));
-bot.telegram.setWebhook(`${botConfig.url}/bot`);
-bot.use(rateLimit(botConfig.rateLimit));
-bot.use(scenes.stage.middleware());
-bot.context.database = database;
-bot.context.MTProto = MTProto;
-bot.context.helper = botHelper;
+bot.use(session());
 bot.use(Telegraf.log());
+bot.use(scenes.stage.middleware());
+bot.use(rateLimit(botConfig.rateLimit));
+bot.telegram.setWebhook(`${botConfig.url}/bot`);
+
+bot.context.MTProto = MTProto;
+bot.context.Helper = botHelper;
+bot.context.Database = database;
 
 bot.use(async (ctx, next) => {
   const authData = (await database
     .ref(MTProtoConfig.sessionPath)
     .once("value")).val();
 
-  if (ctx.helper.isAdmin(ctx.chat.id)) {
+  if (ctx.Helper.isAdmin(ctx.chat.id)) {
     if (authData != null) {
       await next(ctx);
     } else if (ctx.message.text !== "🎫 Log in") {
-      ctx.helper.authKeyboard(ctx, "Pls, log in!");
+      ctx.Helper.authKeyboard(ctx, "Pls, log in!");
     } else {
       await next(ctx);
     }
@@ -40,7 +42,7 @@ bot.use(async (ctx, next) => {
 
 bot.start(async ctx => {
   ctx.session.from = ctx.from;
-  ctx.helper.mainKeyboard(ctx, "Welcome!");
+  ctx.Helper.mainKeyboard(ctx, "Welcome!");
 });
 
 bot.hears("🎫 Log in", ctx => {
@@ -48,19 +50,15 @@ bot.hears("🎫 Log in", ctx => {
 });
 
 bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
-  const { DGroupsKeyboard } = await ctx.helper.DGroups(ctx, 0, 50);
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 50);
 
-  ctx.helper.replyWithInline(
-    ctx,
-    "Here is your groups:",
-    DGroupsKeyboard
-  );
+  ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
 });
 
 bot.hears("👥 Contacts", async ctx => {
-  const { DContactsKeyboard } = await ctx.helper.DContacts(ctx);
+  const { DContactsKeyboard } = await ctx.Helper.DContacts(ctx);
 
-  ctx.helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
+  ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
 });
 
 bot.on("contact", async ctx => {
@@ -75,23 +73,31 @@ bot.on("contact", async ctx => {
   ctx.reply("Console");
 });
 
-bot.action(/contact|/, async (ctx) => {
+bot.action(/contact|/, async ctx => {
   const callbackData = {
-    name: (ctx.match.input).split('|')[1], // D:CODE RJ
-    user_id: (ctx.match.input).split('|')[2], // 127393
-    access_hash: (ctx.match.input).split('|')[3] // 2443773757594061248
-  }
+    name: ctx.match.input.split("|")[1], // D:CODE RJ
+    user_id: ctx.match.input.split("|")[2], // 127393
+    access_hash: ctx.match.input.split("|")[3] // 2443773757594061248
+  };
 
-  ctx.answerCbQuery(callbackData.name)
+  ctx.answerCbQuery(callbackData.name);
 
-  const { DGroups } = await ctx.helper.DGroups(ctx, 0, 50);
+  const { DGroups } = await ctx.Helper.DGroups(ctx, 0, 50);
 
-  console.log(DGroups)
+  console.log(DGroups);
 
   DGroups.forEach(DGroup => {
-    ctx.MTProto.messagesAddChatUser(DGroup.id, callbackData.user_id, callbackData.access_hash)
+    ctx.MTProto.messagesAddChatUser(
+      DGroup.id,
+      callbackData.user_id,
+      callbackData.access_hash
+    ).catch(err => {
+      console.log("___________");
+      console.log(err);
+      return;
+    });
   });
-})
+});
 
 bot.catch(err => {
   botHelper.errHandler(bot, err);

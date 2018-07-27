@@ -66,7 +66,7 @@ const botHelper = {
       }
     });
 
-    ctx.database.ref("/MTProtoAccount/DGroups").set(DGroups);
+    ctx.Database.ref("/MTProtoAccount/DGroups").set(DGroups);
 
     return {
       DGroups,
@@ -98,13 +98,15 @@ const botHelper = {
         DContactsKeyboard.push([
           Markup.callbackButton(
             DContact.first_name,
-            `contact|${DContact.first_name}|${DContact.id}|${DContact.access_hash}`
+            `contact|${DContact.first_name}|${DContact.id}|${
+              DContact.access_hash
+            }`
           )
         ]);
       }
     });
 
-    ctx.database.ref("/MTProtoAccount/DContacts").set(DContacts);
+    ctx.Database.ref("/MTProtoAccount/DContacts").set(DContacts);
 
     return {
       DContacts,
