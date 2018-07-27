@@ -28,7 +28,7 @@ exports.MTProtoConfig = {
   api_id: process.env.API_ID,
   api_hash: process.env.API_HASH,
 
-  sessionPath: "/MTProto/",
+  sessionPath: "/MTProtoSession/",
 
   api: {
     layer: 57,

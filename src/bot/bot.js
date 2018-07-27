@@ -13,7 +13,7 @@ const database = require("../database");
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 
-bot.use(firebaseSession(database.ref("sessions")));
+bot.use(firebaseSession(database.ref("BotSessions")));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use(rateLimit(botConfig.rateLimit));
 bot.use(scenes.stage.middleware());
