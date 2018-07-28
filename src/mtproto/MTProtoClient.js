@@ -97,7 +97,7 @@ class MTProtoClient {
     };
 
     const config = {
-      contacts: inputPhoneContact,
+      contacts: [inputPhoneContact],
       replace
     };
 

@@ -19,7 +19,7 @@ bot.context.Database = database;
 
 bot.use(session());
 bot.use(Telegraf.log());
-bot.use(scenes.stage.middleware());
+bot.use(scenes.middleware());
 bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use((ctx, next) => ctx.Helper.middleware(ctx, next));
@@ -45,6 +45,10 @@ bot.hears("👥 Contacts", async ctx => {
   ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
 });
 
+bot.hears("👤 New contact", ctx => {
+  ctx.scene.enter("addContactScene");
+});
+
 bot.hears("🤓 Profile", async ctx => {
   const { Me } = (await database
     .ref(MTProtoConfig.sessionPath)
@@ -66,18 +70,6 @@ bot.hears("😿 Log Out", ctx => {
   ctx.Database.ref(MTProtoConfig.sessionPath).remove();
 
   ctx.Helper.authKeyboard(ctx, "Logged out 🤷‍♂️");
-});
-
-bot.on("contact", async ctx => {
-  const response = await ctx.MTProto.contactsImportContacts(
-    ctx.message.contact,
-    true,
-    "D:CODE "
-  );
-
-  console.log(response);
-
-  ctx.reply("Console");
 });
 
 bot.action(/contact|/, async ctx => {
