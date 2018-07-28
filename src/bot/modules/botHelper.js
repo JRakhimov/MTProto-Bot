@@ -54,17 +54,26 @@ const botHelper = {
         DGroups.push({
           id: DGroup.id,
           title: DGroup.title,
-          participants_count: DGroup.participants_count
+          participants_count: DGroup.participants_count || 0
         });
+
+        const participantsCount =
+          DGroup.participants_count == null
+            ? ""
+            : `(${DGroup.participants_count})`;
 
         DGroupsKeyboard.push([
           Markup.callbackButton(
-            `${DGroup.title} (${DGroup.participants_count})`,
+            `${DGroup.title} ${participantsCount}`,
             `group|${DGroup.title}|${DGroup.id}`
           )
         ]);
       }
     });
+
+    if (!DGroups.length) {
+      return { DGroupsKeyboard: undefined };
+    }
 
     ctx.Database.ref(MTProtoConfig.sessionPath).update({ DGroups });
 
@@ -105,6 +114,10 @@ const botHelper = {
         ]);
       }
     });
+
+    if (!DContacts.length) {
+      return { DContactsKeyboard: undefined };
+    }
 
     ctx.Database.ref(MTProtoConfig.sessionPath).update({ DContacts });
 

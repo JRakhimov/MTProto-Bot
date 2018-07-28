@@ -38,7 +38,7 @@ exports.MTProtoConfig = {
   },
 
   server: {
-    dev: process.env.IS_DEV ? true : false // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
+    dev: process.env.IS_DEV == "true" ? true : false // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
   }
 };
 

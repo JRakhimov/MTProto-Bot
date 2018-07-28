@@ -36,13 +36,21 @@ bot.hears("🎫 Log in", ctx => {
 bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 50);
 
-  ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
+  if (DGroupsKeyboard != null) {
+    ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
+  } else {
+    ctx.reply('Groups with prefix "D:CODE" not found!');
+  }
 });
 
 bot.hears("👥 Contacts", async ctx => {
   const { DContactsKeyboard } = await ctx.Helper.DContacts(ctx);
 
-  ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
+  if (DContactsKeyboard != null) {
+    ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
+  } else {
+    ctx.reply('Contacts with prefix "D:CODE" not found!');
+  }
 });
 
 bot.hears("👤 New contact", ctx => {
@@ -96,10 +104,6 @@ bot.action(/contact|/, async ctx => {
       return;
     });
   });
-});
-
-bot.catch(err => {
-  botHelper.errHandler(bot, err);
 });
 
 module.exports = bot;
