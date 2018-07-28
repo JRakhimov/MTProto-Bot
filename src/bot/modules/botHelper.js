@@ -3,7 +3,7 @@
 const Markup = require("telegraf/markup");
 const Extra = require("telegraf/extra");
 
-const { botConfig } = require("../../config");
+const { botConfig, MTProtoConfig } = require("../../config");
 
 const botHelper = {
   directReply: (ctx, msgText) => {
@@ -66,7 +66,7 @@ const botHelper = {
       }
     });
 
-    ctx.Database.ref("/MTProtoAccount/DGroups").set(DGroups);
+    ctx.Database.ref(MTProtoConfig.sessionPath).update({ DGroups });
 
     return {
       DGroups,
@@ -106,7 +106,7 @@ const botHelper = {
       }
     });
 
-    ctx.Database.ref("/MTProtoAccount/DContacts").set(DContacts);
+    ctx.Database.ref(MTProtoConfig.sessionPath).update({ DContacts });
 
     return {
       DContacts,

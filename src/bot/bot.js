@@ -63,6 +63,29 @@ bot.hears("👥 Contacts", async ctx => {
   ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
 });
 
+bot.hears("🤓 Profile", async ctx => {
+  const { Me } = (await database
+    .ref(MTProtoConfig.sessionPath)
+    .once("value")).val();
+
+  const profileMessage = [
+    `👩 <b>About Me</b> 👨\n`,
+    `<b>Full name</b>: <code>${Me.first_name} ${Me.last_name || ""}</code>`,
+    `<b>Username</b>: <code>${Me.username}</code>`,
+    `<b>Phone</b>: <code>${Me.phone}</code>`,
+    `<b>User ID</b>: <code>${Me.id}</code>`,
+    `<b>Access hash</b>: <code>${Me.access_hash}</code>`
+  ];
+
+  ctx.replyWithHTML(profileMessage.join("\n"));
+});
+
+bot.hears("😿 Log Out", ctx => {
+  ctx.Database.ref(MTProtoConfig.sessionPath).remove();
+
+  ctx.Helper.authKeyboard(ctx, "Logged out 🤷‍♂️");
+});
+
 bot.on("contact", async ctx => {
   const response = await ctx.MTProto.contactsImportContacts(
     ctx.message.contact,
