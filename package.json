@@ -14,9 +14,9 @@
     "express": "^4.16.3",
     "firebase-admin": "^5.13.1",
     "md5": "^2.2.1",
+    "raven": "^2.6.3",
     "telegraf": "^3.21.2",
     "telegraf-ratelimit": "^2.0.0",
-    "telegraf-session-firebase": "0.0.1",
     "telegram-mtproto": "^2.2.2"
   },
   "devDependencies": {

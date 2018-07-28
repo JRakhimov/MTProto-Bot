@@ -8,7 +8,8 @@ exports.botConfig = {
   scenesTTL: 300, // LifeCycle of scenes in seconds
 
   admins: {
-    rakhimov_j: 379086434
+    rakhimov_j: 379086434,
+    monitoringe: 82493329
   }, // Telegram IDs of admins
 
   rateLimit: {

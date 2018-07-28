@@ -1,6 +1,7 @@
 "use strict";
 
 const Composer = require("telegraf/composer");
+const { MTProtoConfig } = require("../../../config");
 
 const saveCode = new Composer();
 
@@ -24,10 +25,13 @@ saveCode.on("text", async ctx => {
 
     ctx.Helper.mainKeyboard(
       ctx,
-      `Signed in as ${userData.username || user.first_name}`
+      `Signed in as ${userData.username || userData.first_name}`
     );
 
-    ctx.Database.ref("/MTProtoAccount/Me").set(userData);
+    ctx.Database.ref(MTProtoConfig.sessionPath).update({
+      signedIn: true,
+      Me: userData
+    });
 
     return ctx.scene.leave();
   } else {

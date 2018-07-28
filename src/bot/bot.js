@@ -3,7 +3,6 @@
 const Telegraf = require("telegraf"); // Telegraf Dependencies
 const session = require("telegraf/session");
 const rateLimit = require("telegraf-ratelimit");
-// const firebaseSession = require("telegraf-session-firebase");
 
 const MTProtoClient = require("../mtproto/MTProtoClient"); // Local Dependencies
 const { botConfig, MTProtoConfig } = require("../config");
@@ -30,10 +29,13 @@ bot.use(async (ctx, next) => {
     .once("value")).val();
 
   if (ctx.Helper.isAdmin(ctx.chat.id)) {
-    if (authData != null) {
+    if (authData != null && authData.signedIn == true) {
       await next(ctx);
     } else if (ctx.message.text !== "🎫 Log in") {
-      ctx.Helper.authKeyboard(ctx, "Pls, log in!");
+      ctx.Helper.authKeyboard(
+        ctx,
+        "We detected that you are not logged, please log in with command => 🎫 Log in"
+      );
     } else {
       await next(ctx);
     }
@@ -42,7 +44,7 @@ bot.use(async (ctx, next) => {
 
 bot.start(async ctx => {
   ctx.session.from = ctx.from;
-  ctx.Helper.mainKeyboard(ctx, "Welcome!");
+  ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
 });
 
 bot.hears("🎫 Log in", ctx => {
