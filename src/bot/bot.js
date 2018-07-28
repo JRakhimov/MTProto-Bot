@@ -13,34 +13,16 @@ const database = require("../database");
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 
+bot.context.MTProto = MTProto;
+bot.context.Helper = botHelper;
+bot.context.Database = database;
+
 bot.use(session());
 bot.use(Telegraf.log());
 bot.use(scenes.stage.middleware());
 bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
-
-bot.context.MTProto = MTProto;
-bot.context.Helper = botHelper;
-bot.context.Database = database;
-
-bot.use(async (ctx, next) => {
-  const authData = (await database
-    .ref(MTProtoConfig.sessionPath)
-    .once("value")).val();
-
-  if (ctx.Helper.isAdmin(ctx.chat.id)) {
-    if (authData != null && authData.signedIn == true) {
-      await next(ctx);
-    } else if (ctx.message.text !== "🎫 Log in") {
-      ctx.Helper.authKeyboard(
-        ctx,
-        "We detected that you are not logged, please log in with command => 🎫 Log in"
-      );
-    } else {
-      await next(ctx);
-    }
-  }
-});
+bot.use((ctx, next) => ctx.Helper.middleware(ctx, next));
 
 bot.start(async ctx => {
   ctx.session.from = ctx.from;
