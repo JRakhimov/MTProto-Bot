@@ -44,7 +44,7 @@ const botHelper = {
     );
   },
 
-  DGroups: async (ctx, offset, limit) => {
+  DGroups: async (ctx, offset, limit, command = null) => {
     const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
     const DGroups = [];
     const DGroupsKeyboard = [];
@@ -65,7 +65,7 @@ const botHelper = {
         DGroupsKeyboard.push([
           Markup.callbackButton(
             `${DGroup.title} ${participantsCount}`,
-            `group|${DGroup.title}|${DGroup.id}`
+            `group@${DGroup.title}@${DGroup.id}${command ? command : ""}`
           )
         ]);
       }
@@ -107,7 +107,7 @@ const botHelper = {
         DContactsKeyboard.push([
           Markup.callbackButton(
             DContact.first_name,
-            `contact|${DContact.first_name}|${DContact.id}|${
+            `contact@${DContact.first_name}@${DContact.id}@${
               DContact.access_hash
             }`
           )

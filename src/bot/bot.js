@@ -80,30 +80,48 @@ bot.hears("😿 Log Out", ctx => {
   ctx.Helper.authKeyboard(ctx, "Logged out 🤷‍♂️");
 });
 
-bot.action(/contact|/, async ctx => {
+bot.action(/contact@/, async ctx => {
   const callbackData = {
-    name: ctx.match.input.split("|")[1], // D:CODE RJ
-    user_id: ctx.match.input.split("|")[2], // 127393
-    access_hash: ctx.match.input.split("|")[3] // 2443773757594061248
+    name: ctx.match.input.split("@")[1], // D:CODE RJ
+    user_id: ctx.match.input.split("@")[2], // 127393
+    access_hash: ctx.match.input.split("@")[3] // 2443773757594061248
   };
 
   ctx.answerCbQuery(callbackData.name);
+  ctx.session.addContactInfo = callbackData;
 
-  const { DGroups } = await ctx.Helper.DGroups(ctx, 0, 50);
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 50, "@add");
 
-  console.log(DGroups);
+  await ctx.deleteMessage();
+  await ctx.Helper.replyWithInline(
+    ctx,
+    "Select the group you want to add the participant:",
+    DGroupsKeyboard
+  );
+});
 
-  DGroups.forEach(DGroup => {
+bot.action(/group@/, async ctx => {
+  const callbackData = {
+    title: ctx.match.input.split("@")[1], // D:CODE - team
+    id: ctx.match.input.split("@")[2], // 252362085
+    command: ctx.match.input.split("@")[3] || null // add
+  };
+
+  ctx.answerCbQuery(callbackData.title);
+
+  if (callbackData.command == "add") {
     ctx.MTProto.messagesAddChatUser(
-      DGroup.id,
-      callbackData.user_id,
-      callbackData.access_hash
+      callbackData.id,
+      ctx.session.addContactInfo.user_id,
+      ctx.session.addContactInfo.access_hash
     ).catch(err => {
       console.log("___________");
       console.log(err);
-      return;
+      return ctx.editMessageText(err);
     });
-  });
+
+    ctx.editMessageText("Done✨");
+  }
 });
 
 module.exports = bot;
