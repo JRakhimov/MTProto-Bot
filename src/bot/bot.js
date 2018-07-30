@@ -34,7 +34,7 @@ bot.hears("🎫 Log in", ctx => {
 });
 
 bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 50);
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70);
 
   if (DGroupsKeyboard != null) {
     ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
@@ -90,12 +90,12 @@ bot.action(/contact@/, async ctx => {
   ctx.answerCbQuery(callbackData.name);
   ctx.session.addContactInfo = callbackData;
 
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 50, "@add");
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "add");
 
   await ctx.deleteMessage();
   await ctx.Helper.replyWithInline(
     ctx,
-    "Select the group you want to add the participant:",
+    "Select the groups you want to add the participant:",
     DGroupsKeyboard
   );
 });
@@ -103,25 +103,65 @@ bot.action(/contact@/, async ctx => {
 bot.action(/group@/, async ctx => {
   const callbackData = {
     title: ctx.match.input.split("@")[1], // D:CODE - team
+    id: ctx.match.input.split("@")[2] // 252362085
+  };
+
+  ctx.answerCbQuery(callbackData.title);
+});
+
+bot.action(/addGroup@/, async ctx => {
+  const callbackData = {
+    title: ctx.match.input.split("@")[1], // D:CODE - team
     id: ctx.match.input.split("@")[2], // 252362085
-    command: ctx.match.input.split("@")[3] || null // add
+    access_hash: ctx.match.input.split("@")[3] // 3539057495372134628
   };
 
   ctx.answerCbQuery(callbackData.title);
 
-  if (callbackData.command == "add") {
-    ctx.MTProto.messagesAddChatUser(
-      callbackData.id,
-      ctx.session.addContactInfo.user_id,
-      ctx.session.addContactInfo.access_hash
-    ).catch(err => {
-      console.log("___________");
-      console.log(err);
-      return ctx.editMessageText(err);
-    });
+  ctx.session.tempKeyboard =
+    ctx.session.tempKeyboard == null
+      ? (await ctx.Helper.DGroups(ctx, 0, 70, "add")).DGroupsKeyboard
+      : ctx.session.tempKeyboard;
 
-    ctx.editMessageText("Done✨");
-  }
+  const newKeyboard = ctx.Helper.keyboardSwitcher(
+    ctx.session.tempKeyboard,
+    callbackData
+  );
+
+  await ctx.editMessageReplyMarkup({ inline_keyboard: newKeyboard });
+});
+
+bot.action(/save/, async ctx => {
+  ctx.answerCbQuery("Save and Add ✨");
+
+  ctx.session.tempKeyboard.forEach(group => {
+    const isChecked = group[1].text === "✅" ? true : false;
+    if (isChecked) {
+      const channelID = group[1].callback_data.split("@")[2];
+      const channelHash = group[1].callback_data.split("@")[3];
+
+      ctx.MTProto.inviteToChannelRequest(
+        Number(channelID),
+        channelHash,
+        Number(ctx.session.addContactInfo.user_id),
+        ctx.session.addContactInfo.access_hash
+      ).catch(err => {
+        console.log(err);
+        return ctx.replyWithHTML(
+          "<code>" + JSON.stringify(err, undefined, 2) + "</code>"
+        );
+      });
+    }
+  });
+
+  delete ctx.session.addContactInfo;
+  delete ctx.session.tempKeyboard;
+
+  ctx.editMessageText("Done✨");
+});
+
+bot.catch(err => {
+  console.log(err);
 });
 
 module.exports = bot;

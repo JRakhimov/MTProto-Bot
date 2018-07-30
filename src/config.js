@@ -13,8 +13,8 @@ exports.botConfig = {
   }, // Telegram IDs of admins
 
   rateLimit: {
-    window: 2, // Requests
-    limit: 3000 // Period
+    window: 1, // Requests
+      limit: 1500 // Period
   }, // Number of requests per millisecond
 
   telegraf: {

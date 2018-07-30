@@ -44,38 +44,88 @@ const botHelper = {
     );
   },
 
+  keyboardSwitcher: (keyboard, callbackData) => {
+    const newKeyboard = keyboard.map(item => {
+      const itemTitle = item[1].callback_data.split("@")[1];
+
+      if (itemTitle === callbackData.title) {
+        const editedItem = item;
+
+        editedItem[1] = {
+          text: editedItem[1].text === "❌" ? "✅" : "❌",
+          callback_data: editedItem[1].callback_data,
+          hide: false
+        };
+
+        return editedItem;
+      }
+
+      return item;
+    });
+
+    newKeyboard.push([
+      {
+        text: "Save and Add ✨",
+        callback_data: "save"
+      }
+    ]);
+
+    return newKeyboard;
+  },
+
   DGroups: async (ctx, offset, limit, command = null) => {
     const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
     const DGroups = [];
     const DGroupsKeyboard = [];
 
     chats.forEach(DGroup => {
-      if (DGroup.title.match(/D:CODE/) == "D:CODE") {
+      if (DGroup._ == "channel" && DGroup.title.match(/D:CODE/) == "D:CODE") {
         DGroups.push({
+          _: DGroup._,
           id: DGroup.id,
           title: DGroup.title,
-          participants_count: DGroup.participants_count || 0
+          access_hash: DGroup.access_hash
         });
 
-        const participantsCount =
-          DGroup.participants_count == null
-            ? ""
-            : `(${DGroup.participants_count})`;
+        switch (command) {
+          case "add": {
+            DGroupsKeyboard.push([
+              Markup.callbackButton(
+                DGroup.title,
+                `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+              ),
+              Markup.callbackButton(
+                "❌",
+                `addGroup@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+              )
+            ]);
 
-        DGroupsKeyboard.push([
-          Markup.callbackButton(
-            `${DGroup.title} ${participantsCount}`,
-            `group@${DGroup.title}@${DGroup.id}${command ? command : ""}`
-          )
-        ]);
+            break;
+          }
+
+          default: {
+            DGroupsKeyboard.push([
+              Markup.callbackButton(
+                DGroup.title,
+                `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+              )
+            ]);
+
+            break;
+          }
+        }
       }
     });
 
     if (!DGroups.length) {
-      return { DGroupsKeyboard: undefined };
+      return {
+        DGroupsKeyboard: undefined
+      };
     }
 
-    ctx.Database.ref(MTProtoConfig.sessionPath).update({ DGroups });
+    ctx.Database.ref(MTProtoConfig.sessionPath).update({
+      DGroups
+    });
 
     return {
       DGroups,
@@ -116,10 +166,14 @@ const botHelper = {
     });
 
     if (!DContacts.length) {
-      return { DContactsKeyboard: undefined };
+      return {
+        DContactsKeyboard: undefined
+      };
     }
 
-    ctx.Database.ref(MTProtoConfig.sessionPath).update({ DContacts });
+    ctx.Database.ref(MTProtoConfig.sessionPath).update({
+      DContacts
+    });
 
     return {
       DContacts,

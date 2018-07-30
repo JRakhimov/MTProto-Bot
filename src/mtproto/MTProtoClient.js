@@ -62,6 +62,34 @@ class MTProtoClient {
     return response;
   }
 
+  async inviteToChannelRequest(
+    channel_id,
+    channel_access_hash,
+    user_id,
+    user_access_hash
+  ) {
+    const inputChannel = {
+      _: "inputChannel",
+      channel_id,
+      access_hash: channel_access_hash
+    };
+
+    const inputUser = {
+      _: "inputUser",
+      user_id,
+      access_hash: user_access_hash
+    };
+
+    const config = {
+      channel: inputChannel,
+      users: [inputUser]
+    };
+
+    const response = await this.__connector("channels.inviteToChannel", config);
+
+    return response;
+  }
+
   async messagesAddChatUser(chat_id, user_id, access_hash, fwd_limit = 50) {
     const inputUser = {
       _: "inputUser",
