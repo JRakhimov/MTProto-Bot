@@ -132,13 +132,13 @@ bot.action(/addGroup@/, async ctx => {
 bot.action(/add/, async ctx => {
   ctx.answerCbQuery("Save and Add ✨");
 
-  ctx.session.tempKeyboard.forEach(group => {
+  ctx.session.tempKeyboard.forEach(async group => {
     const isChecked = group[1].text === "✅" ? true : false;
     if (isChecked) {
       const channelID = group[1].callback_data.split("@")[2]; // 252362085
       const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
 
-      ctx.MTProto.channelsInviteToChannel(
+      await ctx.MTProto.channelsInviteToChannel(
         Number(channelID),
         channelHash,
         Number(ctx.session.addContactInfo.user_id),
@@ -149,13 +149,13 @@ bot.action(/add/, async ctx => {
           "<code>" + JSON.stringify(err, undefined, 2) + "</code>"
         );
       });
+
+      await delete ctx.session.addContactInfo;
+      await delete ctx.session.tempKeyboard;
+
+      return ctx.editMessageText("Done✨");
     }
   });
-
-  delete ctx.session.addContactInfo;
-  delete ctx.session.tempKeyboard;
-
-  ctx.editMessageText("Done✨");
 });
 
 bot.catch(err => {

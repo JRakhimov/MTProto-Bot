@@ -6,10 +6,14 @@ fs.exists("firebase.json", exists => {
     throw new Error("Invalid firebase config in config.js");
 
   if (!exists) {
-    fs.writeFile("firebase.json", JSON.stringify(firebaseConfig), err => {
-      if (err) throw err;
+    fs.writeFile(
+      "firebase.json",
+      JSON.stringify(firebaseConfig, undefined, 2),
+      err => {
+        if (err) throw err;
 
-      console.log("Firebase service account file generated");
-    });
+        console.log("Firebase service account file generated");
+      }
+    );
   }
 });
