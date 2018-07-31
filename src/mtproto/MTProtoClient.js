@@ -23,6 +23,8 @@ class MTProtoClient {
     });
   }
 
+  /* Auth Methods */
+
   async authSendCode(phone) {
     const config = {
       phone_number: phone,
@@ -51,6 +53,8 @@ class MTProtoClient {
     return response;
   }
 
+  /* Message Methods */
+
   async messagesGetDialogs(offset, limit) {
     const config = {
       offset,
@@ -62,7 +66,37 @@ class MTProtoClient {
     return response;
   }
 
-  async inviteToChannelRequest(
+  async messagesAddChatUser(chat_id, user_id, access_hash, fwd_limit = 50) {
+    const inputUser = {
+      _: "inputUser",
+      user_id,
+      access_hash
+    };
+
+    const config = {
+      chat_id,
+      user_id: inputUser,
+      fwd_limit
+    };
+
+    const response = await this.__connector("messages.addChatUser", config);
+
+    return response;
+  }
+
+  /* Channel Methods */
+
+  /**
+   * Adds user to supergroup or channel
+   *
+   * @name channelsInviteToChannel
+   * @function
+   * @param  {Number} channel_id
+   * @param  {String} channel_access_hash
+   * @param  {Number} user_id
+   * @param  {String} user_access_hash
+   */
+  async channelsInviteToChannel(
     channel_id,
     channel_access_hash,
     user_id,
@@ -90,23 +124,7 @@ class MTProtoClient {
     return response;
   }
 
-  async messagesAddChatUser(chat_id, user_id, access_hash, fwd_limit = 50) {
-    const inputUser = {
-      _: "inputUser",
-      user_id,
-      access_hash
-    };
-
-    const config = {
-      chat_id,
-      user_id: inputUser,
-      fwd_limit
-    };
-
-    const response = await this.__connector("messages.addChatUser", config);
-
-    return response;
-  }
+  /* Contacts Methods */
 
   async contactsGetContacts(contactsList) {
     const config = contactsList ? { hash: md5(contactsList).hash } : {};

@@ -66,7 +66,7 @@ const botHelper = {
     newKeyboard.push([
       {
         text: "Save and Add ✨",
-        callback_data: "save"
+        callback_data: "add"
       }
     ]);
 
@@ -214,7 +214,11 @@ const botHelper = {
     console.log(err);
     helper.toAllAdmins(
       ctx,
-      `<b>An error has been occurred in our bot. Here is details:</b>\n👨‍✈️<code>${err}</code> ☠️`
+      `<b>An error has been occurred in our bot. Here is details:</b>\n👨‍✈️<code>${JSON.stringify(
+        err,
+        undefined,
+        2
+      )}</code> ☠️`
     );
   }
 };

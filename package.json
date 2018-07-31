@@ -1,12 +1,28 @@
 {
-  "name": "katbot",
-  "version": "1.0.0",
+  "name": "mtproto-bot",
+  "version": "1.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node firebase-generator.js && node index.js",
-    "format": "prettier --write \"**/*.js\"",
-    "nodemon": "nodemon index.js"
+    "now": "now && now alias",
+    "format": "prettier --write \"**/*.js\""
+  },
+  "now": {
+    "name": "D:Manager",
+    "alias": "dcode-manager",
+    "files": [
+      "firebase.json"
+    ],
+    "env": {
+      "BOT_TOKEN": "@d-token",
+      "HOST": "@d-host",
+      "BOT_NAME": "@d-name",
+      "API_HASH": "@d-api-hash",
+      "API_ID": "@d-api-id",
+      "IS_DEV": "false"
+    },
+    "public": true
   },
   "author": "",
   "license": "MIT",
@@ -14,14 +30,12 @@
     "express": "^4.16.3",
     "firebase-admin": "^5.13.1",
     "md5": "^2.2.1",
-    "raven": "^2.6.3",
     "telegraf": "^3.21.2",
     "telegraf-ratelimit": "^2.0.0",
     "telegram-mtproto": "^2.2.2"
   },
   "devDependencies": {
     "dotenv": "^6.0.0",
-    "nodemon": "^1.18.3",
     "prettier": "^1.13.6"
   }
 }

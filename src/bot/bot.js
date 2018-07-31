@@ -25,7 +25,6 @@ bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use((ctx, next) => ctx.Helper.middleware(ctx, next));
 
 bot.start(async ctx => {
-  ctx.session.from = ctx.from;
   ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
 });
 
@@ -102,8 +101,7 @@ bot.action(/contact@/, async ctx => {
 
 bot.action(/group@/, async ctx => {
   const callbackData = {
-    title: ctx.match.input.split("@")[1], // D:CODE - team
-    id: ctx.match.input.split("@")[2] // 252362085
+    title: ctx.match.input.split("@")[1] // D:CODE - team
   };
 
   ctx.answerCbQuery(callbackData.title);
@@ -131,16 +129,16 @@ bot.action(/addGroup@/, async ctx => {
   await ctx.editMessageReplyMarkup({ inline_keyboard: newKeyboard });
 });
 
-bot.action(/save/, async ctx => {
+bot.action(/add/, async ctx => {
   ctx.answerCbQuery("Save and Add ✨");
 
   ctx.session.tempKeyboard.forEach(group => {
     const isChecked = group[1].text === "✅" ? true : false;
     if (isChecked) {
-      const channelID = group[1].callback_data.split("@")[2];
-      const channelHash = group[1].callback_data.split("@")[3];
+      const channelID = group[1].callback_data.split("@")[2]; // 252362085
+      const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
 
-      ctx.MTProto.inviteToChannelRequest(
+      ctx.MTProto.channelsInviteToChannel(
         Number(channelID),
         channelHash,
         Number(ctx.session.addContactInfo.user_id),
