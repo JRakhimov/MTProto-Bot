@@ -23,6 +23,25 @@ class MTProtoClient {
     });
   }
 
+  request(query, config, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+      const start = new Date();
+      this.__connector(query, config)
+        .then(response => {
+          const ms = new Date() - start;
+          console.log(`Response time: ${ms}ms`);
+          return resolve(response);
+        })
+        .catch(err => {
+          return reject(err);
+        });
+
+      setTimeout(() => {
+        return reject({ code: 500, message: "Timeout" });
+      }, timeout);
+    });
+  }
+
   /* Auth Methods */
 
   async authSendCode(phone) {
@@ -33,7 +52,7 @@ class MTProtoClient {
       api_hash: this.__api_hash
     };
 
-    const response = await this.__connector("auth.sendCode", config);
+    const response = await this.request("auth.sendCode", config);
 
     this.__phone_code_hash = response.phone_code_hash;
     this.__phone = phone;
@@ -48,7 +67,7 @@ class MTProtoClient {
       phone_code_hash: this.__phone_code_hash
     };
 
-    const response = await this.__connector("auth.signIn", config);
+    const response = await this.request("auth.signIn", config);
 
     return response;
   }
@@ -61,7 +80,7 @@ class MTProtoClient {
       limit
     };
 
-    const response = await this.__connector("messages.getDialogs", config);
+    const response = await this.request("messages.getDialogs", config, 35000);
 
     return response;
   }
@@ -79,7 +98,7 @@ class MTProtoClient {
       fwd_limit
     };
 
-    const response = await this.__connector("messages.addChatUser", config);
+    const response = await this.request("messages.addChatUser", config);
 
     return response;
   }
@@ -119,7 +138,7 @@ class MTProtoClient {
       users: [inputUser]
     };
 
-    const response = await this.__connector("channels.inviteToChannel", config);
+    const response = await this.request("channels.inviteToChannel", config);
 
     return response;
   }
@@ -129,7 +148,7 @@ class MTProtoClient {
   async contactsGetContacts(contactsList) {
     const config = contactsList ? { hash: md5(contactsList).hash } : {};
 
-    const response = await this.__connector("contacts.getContacts", config);
+    const response = await this.request("contacts.getContacts", config);
 
     return response;
   }
@@ -147,7 +166,7 @@ class MTProtoClient {
       replace
     };
 
-    const response = await this.__connector("contacts.importContacts", config);
+    const response = await this.request("contacts.importContacts", config);
 
     return response;
   }
