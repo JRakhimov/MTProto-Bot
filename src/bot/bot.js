@@ -149,13 +149,13 @@ bot.action(/add/, async ctx => {
           "<code>" + JSON.stringify(err, undefined, 2) + "</code>"
         );
       });
-
-      await delete ctx.session.addContactInfo;
-      await delete ctx.session.tempKeyboard;
-
-      return ctx.editMessageText("Done✨");
     }
   });
+
+  delete ctx.session.addContactInfo;
+  delete ctx.session.tempKeyboard;
+
+  await ctx.editMessageText("Done✨");
 });
 
 bot.catch(err => {

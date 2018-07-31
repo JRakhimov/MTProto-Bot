@@ -23,26 +23,29 @@ class MTProtoClient {
     });
   }
 
-  request(query, config, timeout = 10000) {
-    return new Promise((resolve, reject) => {
+  request(query, config) {
       const start = new Date();
+    return new Promise((resolve, reject) => {
       this.__connector(query, config)
-        .then(response => {
-          const ms = new Date() - start;
-          console.log(`Response time: ${ms}ms`);
-          return resolve(response);
+        .then(res => {
+          const stop = new Date() - start;
+          console.log(`Response time: ${stop}ms`)
+          return resolve(res)
         })
         .catch(err => {
-          return reject(err);
-        });
+          return reject(err)
+        })
 
       setTimeout(() => {
-        return reject({ code: 500, message: "Timeout" });
-      }, timeout);
+        return reject({
+          code: 500,
+          message: "Timeout"
     });
+      }, 10000);
+    })
   }
 
-  /* Auth Methods */
+  /* Registration / Authorization */
 
   async authSendCode(phone) {
     const config = {
@@ -72,7 +75,7 @@ class MTProtoClient {
     return response;
   }
 
-  /* Message Methods */
+  /* Working with Messages */
 
   async messagesGetDialogs(offset, limit) {
     const config = {
@@ -80,7 +83,7 @@ class MTProtoClient {
       limit
     };
 
-    const response = await this.request("messages.getDialogs", config, 35000);
+    const response = await this.request("messages.getDialogs", config);
 
     return response;
   }
@@ -103,7 +106,7 @@ class MTProtoClient {
     return response;
   }
 
-  /* Channel Methods */
+  /* Working with Channels */
 
   /**
    * Adds user to supergroup or channel
@@ -143,7 +146,7 @@ class MTProtoClient {
     return response;
   }
 
-  /* Contacts Methods */
+  /* Working with Contacts */
 
   async contactsGetContacts(contactsList) {
     const config = contactsList ? { hash: md5(contactsList).hash } : {};
