@@ -29,7 +29,7 @@ class MTProtoClient {
       this.__connector(query, config)
         .then(res => {
           const stop = new Date() - start;
-          console.log(`Response time: ${stop}ms`)
+          console.log(`Response time for ${query} is ${stop}ms`)
           return resolve(res)
         })
         .catch(err => {
