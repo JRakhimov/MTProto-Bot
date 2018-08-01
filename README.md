@@ -77,7 +77,7 @@ npm run start
 
 All of your bot's requests will be logged in your terminal.
 
-![sampleBot](https://raw.githubusercontent.com/JRakhimov/MTProto-Bot/master/images/sample.mp4)
+![sampleBot](https://raw.githubusercontent.com/JRakhimov/MTProto-Bot/master/images/sample.gif)
 
 ## Commands
 
