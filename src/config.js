@@ -32,12 +32,28 @@ exports.MTProtoConfig = {
   sessionPath: "/MTProtoSession/",
 
   api: {
+    invokeWithLayer: 0xda9b0d0d,
     layer: 57,
     initConnection: 0x69796de9,
-    api_id: +process.env.API_ID
+    api_id: +process.env.API_ID,
+    app_version: "1.2.0",
+    lang_code: "en"
   },
 
   server: {
+    webogram: true,
+    dcList: [
+      {
+        id: 2,
+        host: "149.154.167.50", // Production
+        port: 443
+      },
+      {
+        id: 2,
+        host: "149.154.167.40", // Test
+        port: 443
+      }
+    ],
     dev: process.env.IS_DEV == "true" ? true : false // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
   }
 };

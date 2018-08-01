@@ -18,7 +18,7 @@ bot.context.Helper = botHelper;
 bot.context.Database = database;
 
 bot.use(session());
-bot.use(Telegraf.log());
+// bot.use(Telegraf.log());
 bot.use(scenes.middleware());
 bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);

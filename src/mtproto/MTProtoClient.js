@@ -24,25 +24,25 @@ class MTProtoClient {
   }
 
   request(query, config) {
-      const start = new Date();
+    const start = new Date();
     return new Promise((resolve, reject) => {
       this.__connector(query, config)
         .then(res => {
           const stop = new Date() - start;
-          console.log(`Response time for ${query} is ${stop}ms`)
-          return resolve(res)
+          console.log(`Response time for ${query} is ${stop}ms`);
+          return resolve(res);
         })
         .catch(err => {
-          return reject(err)
-        })
+          return reject(err);
+        });
 
       setTimeout(() => {
         return reject({
           code: 500,
           message: "Timeout"
-    });
+        });
       }, 10000);
-    })
+    });
   }
 
   /* Registration / Authorization */
