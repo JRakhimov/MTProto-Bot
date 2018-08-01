@@ -42,6 +42,20 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   }
 });
 
+bot.hears("🔀 Merge groups", async ctx => {
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "merge");
+
+  if (DGroupsKeyboard != null) {
+    ctx.Helper.replyWithInline(
+      ctx,
+      "Select the group from which you want to take the participants",
+      DGroupsKeyboard
+    );
+  } else {
+    ctx.replyWithHTML('Groups with prefix <b>"D:CODE"</b> not found!');
+  }
+});
+
 bot.hears("👥 Contacts", async ctx => {
   const { DContactsKeyboard } = await ctx.Helper.DContacts(ctx);
 
@@ -157,6 +171,8 @@ bot.action(/add/, async ctx => {
 
   await ctx.editMessageText("Done✨");
 });
+
+bot.action(/mergeFrom/, async ctx => {});
 
 bot.catch(err => {
   console.log(err);

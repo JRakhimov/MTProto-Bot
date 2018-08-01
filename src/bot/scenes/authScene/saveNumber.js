@@ -9,7 +9,7 @@ saveNumber.on("text", async ctx => {
     ctx.message.entities != null &&
     ctx.message.entities[0].type === "phone_number"
   ) {
-    ctx.reply("Sending the code...")
+    ctx.reply("Sending the code...");
     await ctx.MTProto.authSendCode(ctx.message.text);
 
     // Telegram automatically invalidates your login code

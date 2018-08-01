@@ -25,7 +25,7 @@ const botHelper = {
       msgText,
       Extra.HTML().markup(
         Markup.keyboard([
-          ["👨‍👨‍👧‍👦 Groups"],
+          ["👨‍👨‍👧‍👦 Groups", "🔀 Merge groups"],
           ["👥 Contacts", "👤 New contact"],
           ["🤓 Profile", "😿 Log Out"]
         ]).resize()
@@ -73,7 +73,7 @@ const botHelper = {
     return newKeyboard;
   },
 
-  DGroups: async (ctx, offset, limit, command = null) => {
+  DGroups: async (ctx, offset = 0, limit = 70, command) => {
     const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
     const DGroups = [];
     const DGroupsKeyboard = [];
@@ -101,6 +101,15 @@ const botHelper = {
             ]);
 
             break;
+          }
+
+          case "merge": {
+            DGroupsKeyboard.push([
+              Markup.callbackButton(
+                DGroup.title,
+                `mergeFrom@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+              )
+            ]);
           }
 
           default: {

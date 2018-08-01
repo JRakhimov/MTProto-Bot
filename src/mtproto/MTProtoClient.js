@@ -146,6 +146,43 @@ class MTProtoClient {
     return response;
   }
 
+  /**
+   * Returns a vector of participants
+   *
+   * @name channelsChannelParticipants
+   * @function
+   * @param {Number} channel_id
+   * @param {String} channel_access_hash
+   * @param {ChannelParticipantsFilter} filter
+   * @param {Number} offset
+   * @param {Number} limit
+   */
+  async channelsChannelParticipants(
+    channel_id,
+    channel_access_hash,
+    offset,
+    limit,
+    filter
+  ) {
+    const inputChannel = {
+      _: "inputChannel",
+      channel_id,
+      access_hash: channel_access_hash
+    };
+
+    const config = {
+      channel: inputChannel,
+      hash: inputChannel.access_hash,
+      filter,
+      offset,
+      limit
+    };
+
+    const response = await this.request("channels.channelParticipants", config);
+
+    return response;
+  }
+
   /* Working with Contacts */
 
   async contactsGetContacts(contactsList) {
