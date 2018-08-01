@@ -25,7 +25,7 @@ saveCode.on("text", async ctx => {
 
     ctx.Helper.mainKeyboard(
       ctx,
-      `Signed in as ${userData.username || userData.first_name}`
+      `Signed in as <b>${userData.username || userData.first_name}</b>`
     );
 
     ctx.Database.ref(MTProtoConfig.sessionPath).update({

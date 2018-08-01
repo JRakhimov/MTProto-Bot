@@ -38,7 +38,7 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   if (DGroupsKeyboard != null) {
     ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
   } else {
-    ctx.reply('Groups with prefix "D:CODE" not found!');
+    ctx.replyWithHTML('Groups with prefix <b>"D:CODE"</b> not found!');
   }
 });
 
@@ -48,7 +48,7 @@ bot.hears("👥 Contacts", async ctx => {
   if (DContactsKeyboard != null) {
     ctx.Helper.replyWithInline(ctx, "Here is your contacts", DContactsKeyboard);
   } else {
-    ctx.reply('Contacts with prefix "D:CODE" not found!');
+    ctx.replyWithHTML('Contacts with prefix <b>"D:CODE"</b> not found!');
   }
 });
 
