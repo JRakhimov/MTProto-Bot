@@ -33,7 +33,7 @@ bot.hears("🎫 Log in", ctx => {
 });
 
 bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70);
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx);
 
   if (DGroupsKeyboard != null) {
     ctx.Helper.replyWithInline(ctx, "Here is your groups:", DGroupsKeyboard);
@@ -43,7 +43,7 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
 });
 
 bot.hears("🔀 Merge groups", async ctx => {
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "mergeFrom");
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, "mergeFrom");
 
   if (DGroupsKeyboard != null) {
     ctx.Helper.replyWithInline(
@@ -99,9 +99,10 @@ bot.action(/contact@/, async ctx => {
   ctx.answerCbQuery(cbData.name);
   ctx.session.addContactInfo = cbData;
 
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "add");
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, "add");
 
   await ctx.deleteMessage();
+
   await ctx.Helper.replyWithInline(
     ctx,
     "Select the groups you want to add the participant:",
@@ -122,7 +123,7 @@ bot.action(/addGroup@/, async ctx => {
 
   ctx.session.tempKeyboard =
     ctx.session.tempKeyboard == null
-      ? (await ctx.Helper.DGroups(ctx, 0, 70, "add")).DGroupsKeyboard
+      ? (await ctx.Helper.DGroups(ctx, "add")).DGroupsKeyboard
       : ctx.session.tempKeyboard;
 
   const newKeyboard = ctx.Helper.keyboardSwitcher(
@@ -137,7 +138,8 @@ bot.action(/add/, async ctx => {
   ctx.answerCbQuery("Save and Add ✨");
 
   ctx.session.tempKeyboard.forEach(async group => {
-    const isChecked = group[1].text === "✅" ? true : false;
+    const isChecked = group[1].text === "✅";
+
     if (isChecked) {
       const channelID = group[1].callback_data.split("@")[2]; // 252362085
       const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
@@ -145,17 +147,14 @@ bot.action(/add/, async ctx => {
       await ctx.MTProto.channelsInviteToChannel(
         Number(channelID),
         channelHash,
-        [{
-          _: "inputUser",
-          user_id: Number(ctx.session.addContactInfo.user_id),
-          access_hash: ctx.session.addContactInfo.access_hash
-        }]
-      ).catch(err => {
-        console.log(err);
-        return ctx.replyWithHTML(
-          "<code>" + JSON.stringify(err, undefined, 2) + "</code>"
-        );
-      });
+        [
+          {
+            _: "inputUser",
+            user_id: Number(ctx.session.addContactInfo.user_id),
+            access_hash: ctx.session.addContactInfo.access_hash
+          }
+        ]
+      );
     }
   });
 
@@ -165,24 +164,35 @@ bot.action(/add/, async ctx => {
   await ctx.editMessageText("Done✨");
 });
 
-bot.action(/mergeFrom/, async ctx => {
+bot.action(/mergeFrom@/, async ctx => {
   const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-  
+
   ctx.answerCbQuery(cbData.title);
 
-  const { users } = await ctx.MTProto.channelsGetParticipants(cbData.id, cbData.access_hash, 0, 15);
+  const { users } = await ctx.MTProto.channelsGetParticipants(
+    cbData.id,
+    cbData.access_hash,
+    0,
+    30
+  );
 
-  ctx.session.originUsers = users.map(user => {
-    if (user.self == null) {
-      return {
-        _: "inputUser",
-        user_id: user.id,
-        access_hash: user.access_hash
+  ctx.session.originUsers = users
+    .map(user => {
+      if (user.self == null) {
+        return {
+          _: "inputUser",
+          user_id: user.id,
+          access_hash: user.access_hash
+        };
       }
-    }
-  }).filter(user => user != null)
+    })
+    .filter(user => user != null);
 
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "mergeWith", cbData.title);
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(
+    ctx,
+    "mergeWith",
+    cbData.title
+  );
 
   await ctx.deleteMessage();
   await ctx.Helper.replyWithInline(
@@ -192,16 +202,16 @@ bot.action(/mergeFrom/, async ctx => {
   );
 });
 
-bot.action(/mergeWith/, async ctx => {
+bot.action(/mergeWith@/, async ctx => {
   const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-  
+
   ctx.answerCbQuery(cbData.title);
 
   await ctx.MTProto.channelsInviteToChannel(
     Number(cbData.id),
     cbData.access_hash,
     ctx.session.originUsers
-  )
+  );
 
   delete ctx.session.originUsers;
 

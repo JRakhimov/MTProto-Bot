@@ -73,7 +73,7 @@ const botHelper = {
     return newKeyboard;
   },
 
-  DGroups: async (ctx, offset = 0, limit = 70, command, skip) => {
+  DGroups: async (ctx, command, skip, offset = 0, limit = 70) => {
     const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
     const DGroups = [];
     const DGroupsKeyboard = [];
@@ -216,7 +216,7 @@ const botHelper = {
           access_hash: input.split("@")[3] // 2443773757594061248
         };
       }
-      
+
       case "group": {
         return {
           title: input.split("@")[1], // D:CODE - team

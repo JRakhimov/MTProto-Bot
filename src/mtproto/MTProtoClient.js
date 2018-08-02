@@ -118,11 +118,7 @@ class MTProtoClient {
    * @param  {String} channel_access_hash
    * @param  {Array} users
    */
-  async channelsInviteToChannel(
-    channel_id,
-    channel_access_hash,
-    users
-  ) {
+  async channelsInviteToChannel(channel_id, channel_access_hash, users) {
     const inputChannel = {
       _: "inputChannel",
       channel_id,
@@ -154,7 +150,7 @@ class MTProtoClient {
     channel_id,
     channel_access_hash,
     offset,
-    limit,
+    limit
   ) {
     const inputChannel = {
       _: "inputChannel",
@@ -164,7 +160,7 @@ class MTProtoClient {
 
     const filter = {
       _: "channelParticipantsRecent"
-    }
+    };
 
     const config = {
       channel: inputChannel,
