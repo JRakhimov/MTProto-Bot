@@ -43,7 +43,7 @@ bot.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
 });
 
 bot.hears("🔀 Merge groups", async ctx => {
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "merge");
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "mergeFrom");
 
   if (DGroupsKeyboard != null) {
     ctx.Helper.replyWithInline(
@@ -145,8 +145,11 @@ bot.action(/add/, async ctx => {
       await ctx.MTProto.channelsInviteToChannel(
         Number(channelID),
         channelHash,
-        Number(ctx.session.addContactInfo.user_id),
-        ctx.session.addContactInfo.access_hash
+        [{
+          _: "inputUser",
+          user_id: Number(ctx.session.addContactInfo.user_id),
+          access_hash: ctx.session.addContactInfo.access_hash
+        }]
       ).catch(err => {
         console.log(err);
         return ctx.replyWithHTML(
@@ -162,7 +165,48 @@ bot.action(/add/, async ctx => {
   await ctx.editMessageText("Done✨");
 });
 
-bot.action(/mergeFrom/, async ctx => {});
+bot.action(/mergeFrom/, async ctx => {
+  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
+  
+  ctx.answerCbQuery(cbData.title);
+
+  const { users } = await ctx.MTProto.channelsGetParticipants(cbData.id, cbData.access_hash, 0, 15);
+
+  ctx.session.originUsers = users.map(user => {
+    if (user.self == null) {
+      return {
+        _: "inputUser",
+        user_id: user.id,
+        access_hash: user.access_hash
+      }
+    }
+  }).filter(user => user != null)
+
+  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "mergeWith", cbData.title);
+
+  await ctx.deleteMessage();
+  await ctx.Helper.replyWithInline(
+    ctx,
+    "Select the group you want to add the participants:",
+    DGroupsKeyboard
+  );
+});
+
+bot.action(/mergeWith/, async ctx => {
+  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
+  
+  ctx.answerCbQuery(cbData.title);
+
+  await ctx.MTProto.channelsInviteToChannel(
+    Number(cbData.id),
+    cbData.access_hash,
+    ctx.session.originUsers
+  )
+
+  delete ctx.session.originUsers;
+
+  await ctx.editMessageText("Done✨");
+});
 
 bot.catch(err => {
   console.log(err);

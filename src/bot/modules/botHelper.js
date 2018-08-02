@@ -73,7 +73,7 @@ const botHelper = {
     return newKeyboard;
   },
 
-  DGroups: async (ctx, offset = 0, limit = 70, command) => {
+  DGroups: async (ctx, offset = 0, limit = 70, command, skip) => {
     const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
     const DGroups = [];
     const DGroupsKeyboard = [];
@@ -103,13 +103,30 @@ const botHelper = {
             break;
           }
 
-          case "merge": {
+          case "mergeFrom": {
             DGroupsKeyboard.push([
               Markup.callbackButton(
                 DGroup.title,
                 `mergeFrom@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
               )
             ]);
+
+            break;
+          }
+
+          case "mergeWith": {
+            if (skip != DGroup.title) {
+              DGroupsKeyboard.push([
+                Markup.callbackButton(
+                  DGroup.title,
+                  `mergeWith@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+                )
+              ]);
+
+              break;
+            }
+
+            break;
           }
 
           default: {
