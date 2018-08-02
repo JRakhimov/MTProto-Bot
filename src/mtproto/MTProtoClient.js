@@ -30,7 +30,7 @@ class MTProtoClient {
         .then(res => {
           const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
-          console.log(`Config: ${JSON.stringify(config, undefined, 2)}`);
+          // console.log(`Config: ${JSON.stringify(config, undefined, 2)}`);
           return resolve(res);
         })
         .catch(err => {
@@ -46,7 +46,7 @@ class MTProtoClient {
     });
   }
 
-  /* Registration / Authorization */
+  /* Registration / Authorization ------------------------------ */
 
   async authSendCode(phone) {
     const config = {
@@ -76,8 +76,16 @@ class MTProtoClient {
     return response;
   }
 
-  /* Working with Messages */
+  /* Working with Messages ------------------------------ */
 
+  /**
+   * Fetches your last dialogs
+   * @name messagesGetDialogs
+   * @function
+   * @param {Number} offset
+   * @param {Number} limit
+   */
+  
   async messagesGetDialogs(offset, limit) {
     const config = {
       offset,
@@ -88,6 +96,17 @@ class MTProtoClient {
 
     return response;
   }
+
+  /**
+   * Adds user to general groups
+   * 
+   * @name messagesAddChatUser
+   * @function
+   * @param {Number} chat_id
+   * @param {Number} user_id
+   * @param {String} access_hash
+   * @param {Number} fwd_limit
+   */
 
   async messagesAddChatUser(chat_id, user_id, access_hash, fwd_limit = 50) {
     const inputUser = {
@@ -107,7 +126,7 @@ class MTProtoClient {
     return response;
   }
 
-  /* Working with Channels */
+  /* Working with Channels ------------------------------ */
 
   /**
    * Adds user to supergroup or channel
@@ -118,6 +137,7 @@ class MTProtoClient {
    * @param  {String} channel_access_hash
    * @param  {Array} users
    */
+
   async channelsInviteToChannel(channel_id, channel_access_hash, users) {
     const inputChannel = {
       _: "inputChannel",
@@ -138,14 +158,14 @@ class MTProtoClient {
   /**
    * Returns a vector of participants
    *
-   * @name channelsChannelParticipants
+   * @name channelsGetParticipants
    * @function
    * @param {Number} channel_id
    * @param {String} channel_access_hash
-   * @param {ChannelParticipantsFilter} filter
    * @param {Number} offset
    * @param {Number} limit
    */
+
   async channelsGetParticipants(
     channel_id,
     channel_access_hash,
@@ -175,7 +195,7 @@ class MTProtoClient {
     return response;
   }
 
-  /* Working with Contacts */
+  /* Working with Contacts ------------------------------ */
 
   async contactsGetContacts(contactsList) {
     const config = contactsList ? { hash: md5(contactsList).hash } : {};
