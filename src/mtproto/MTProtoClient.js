@@ -30,6 +30,7 @@ class MTProtoClient {
         .then(res => {
           const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
+          console.log(`Config: ${JSON.stringify(config, undefined, 2)}`);
           return resolve(res);
         })
         .catch(err => {
@@ -115,14 +116,12 @@ class MTProtoClient {
    * @function
    * @param  {Number} channel_id
    * @param  {String} channel_access_hash
-   * @param  {Number} user_id
-   * @param  {String} user_access_hash
+   * @param  {Array} users
    */
   async channelsInviteToChannel(
     channel_id,
     channel_access_hash,
-    user_id,
-    user_access_hash
+    users
   ) {
     const inputChannel = {
       _: "inputChannel",
@@ -130,15 +129,9 @@ class MTProtoClient {
       access_hash: channel_access_hash
     };
 
-    const inputUser = {
-      _: "inputUser",
-      user_id,
-      access_hash: user_access_hash
-    };
-
     const config = {
       channel: inputChannel,
-      users: [inputUser]
+      users: users
     };
 
     const response = await this.request("channels.inviteToChannel", config);
@@ -157,12 +150,11 @@ class MTProtoClient {
    * @param {Number} offset
    * @param {Number} limit
    */
-  async channelsChannelParticipants(
+  async channelsGetParticipants(
     channel_id,
     channel_access_hash,
     offset,
     limit,
-    filter
   ) {
     const inputChannel = {
       _: "inputChannel",
@@ -170,15 +162,19 @@ class MTProtoClient {
       access_hash: channel_access_hash
     };
 
+    const filter = {
+      _: "channelParticipantsRecent"
+    }
+
     const config = {
       channel: inputChannel,
       hash: inputChannel.access_hash,
-      filter,
       offset,
-      limit
+      limit,
+      filter
     };
 
-    const response = await this.request("channels.channelParticipants", config);
+    const response = await this.request("channels.getParticipants", config);
 
     return response;
   }
