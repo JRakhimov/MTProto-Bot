@@ -21,6 +21,8 @@ class MTProtoClient {
       server: MTProtoConfig.server,
       api: MTProtoConfig.api
     });
+
+    this.__errors = 0;
   }
 
   request(query, config) {
@@ -28,12 +30,20 @@ class MTProtoClient {
     return new Promise((resolve, reject) => {
       this.__connector(query, config)
         .then(res => {
+          this.__errors = 0;
           const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
+
           return resolve(res);
         })
         .catch(err => {
-          console.log(err);
+          if (this.__errors >= 3) {
+            return resolve({ code: 429, message: "Flood" });
+          }
+
+          this.__errors += 1;
+          console.log(err, this.__errors);
+
           return reject(err);
         });
 
@@ -85,7 +95,7 @@ class MTProtoClient {
    * @param {Number} offset
    * @param {Number} limit
    */
-  
+
   async messagesGetDialogs(offset, limit) {
     const config = {
       offset,
@@ -99,7 +109,7 @@ class MTProtoClient {
 
   /**
    * Adds user to general groups
-   * 
+   *
    * @name messagesAddChatUser
    * @function
    * @param {Number} chat_id
