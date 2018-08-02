@@ -11,9 +11,6 @@
   "now": {
     "name": "D:Manager",
     "alias": "dcode-manager",
-    "files": [
-      "firebase.json"
-    ],
     "env": {
       "BOT_TOKEN": "@d-token",
       "HOST": "@d-host",

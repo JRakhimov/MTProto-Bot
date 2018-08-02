@@ -99,7 +99,9 @@ bot.action(/contact@/, async ctx => {
   ctx.answerCbQuery(cbData.name);
   ctx.session.addContactInfo = cbData;
 
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, "add");
+  const {
+    DGroupsKeyboard
+  } = await ctx.Helper.DGroups(ctx, "add").catch(err => ctx.Helper.errHandler(ctx, err))
 
   await ctx.deleteMessage();
 
@@ -154,7 +156,7 @@ bot.action(/add/, async ctx => {
             access_hash: ctx.session.addContactInfo.access_hash
           }
         ]
-      );
+      ).catch(err => ctx.Helper.errHandler(ctx, err))
     }
   });
 

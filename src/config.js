@@ -9,7 +9,8 @@ exports.botConfig = {
 
   admins: {
     rakhimov_j: 379086434,
-    monitoringe: 82493329
+    monitoringe: 82493329,
+    admin: 468716679
   }, // Telegram IDs of admins
 
   rateLimit: {

@@ -30,10 +30,10 @@ class MTProtoClient {
         .then(res => {
           const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
-          // console.log(`Config: ${JSON.stringify(config, undefined, 2)}`);
           return resolve(res);
         })
         .catch(err => {
+          console.log(err);
           return reject(err);
         });
 

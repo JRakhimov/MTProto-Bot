@@ -172,22 +172,24 @@ const botHelper = {
     const DContactsKeyboard = [];
 
     users.forEach(DContact => {
-      if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
-        DContacts.push({
-          id: DContact.id,
-          access_hash: DContact.access_hash,
-          first_name: DContact.first_name,
-          phone: DContact.phone
-        });
+      if (DContact.first_name != null) {
+        if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
+          DContacts.push({
+            id: DContact.id,
+            access_hash: DContact.access_hash,
+            first_name: DContact.first_name,
+            phone: DContact.phone
+          });
 
-        DContactsKeyboard.push([
-          Markup.callbackButton(
-            DContact.first_name,
-            `contact@${DContact.first_name}@${DContact.id}@${
-              DContact.access_hash
-            }`
-          )
-        ]);
+          DContactsKeyboard.push([
+            Markup.callbackButton(
+              DContact.first_name,
+              `contact@${DContact.first_name}@${DContact.id}@${
+                DContact.access_hash
+              }`
+            )
+          ]);
+        }
       }
     });
 
