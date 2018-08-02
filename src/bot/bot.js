@@ -94,14 +94,10 @@ bot.hears("😿 Log Out", ctx => {
 });
 
 bot.action(/contact@/, async ctx => {
-  const callbackData = {
-    name: ctx.match.input.split("@")[1], // D:CODE RJ
-    user_id: ctx.match.input.split("@")[2], // 127393
-    access_hash: ctx.match.input.split("@")[3] // 2443773757594061248
-  };
+  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "contact");
 
-  ctx.answerCbQuery(callbackData.name);
-  ctx.session.addContactInfo = callbackData;
+  ctx.answerCbQuery(cbData.name);
+  ctx.session.addContactInfo = cbData;
 
   const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, 0, 70, "add");
 
@@ -114,21 +110,15 @@ bot.action(/contact@/, async ctx => {
 });
 
 bot.action(/group@/, async ctx => {
-  const callbackData = {
-    title: ctx.match.input.split("@")[1] // D:CODE - team
-  };
+  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
 
-  ctx.answerCbQuery(callbackData.title);
+  ctx.answerCbQuery(cbData.title);
 });
 
 bot.action(/addGroup@/, async ctx => {
-  const callbackData = {
-    title: ctx.match.input.split("@")[1], // D:CODE - team
-    id: ctx.match.input.split("@")[2], // 252362085
-    access_hash: ctx.match.input.split("@")[3] // 3539057495372134628
-  };
+  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
 
-  ctx.answerCbQuery(callbackData.title);
+  ctx.answerCbQuery(cbData.title);
 
   ctx.session.tempKeyboard =
     ctx.session.tempKeyboard == null
@@ -137,7 +127,7 @@ bot.action(/addGroup@/, async ctx => {
 
   const newKeyboard = ctx.Helper.keyboardSwitcher(
     ctx.session.tempKeyboard,
-    callbackData
+    cbData
   );
 
   await ctx.editMessageReplyMarkup({ inline_keyboard: newKeyboard });
