@@ -10,7 +10,7 @@ addContactScene.on("contact", async ctx => {
   const { imported, users } = await ctx.MTProto.contactsImportContacts(
     ctx.message.contact,
     true,
-    "D:CODE "
+    ctx.message.contact.first_name.match(/D:CODE/) ? "" : "D:CODE " // check for the contact name already has prefix
   );
 
   if (imported != null) {
