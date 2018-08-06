@@ -160,53 +160,68 @@ const botHelper = {
   },
 
   DContacts: async ctx => {
-    const { contacts } = await ctx.MTProto.contactsGetContacts();
-    const contactsList = [];
+    const value = (await ctx.Database
+      .ref(MTProtoConfig.sessionPath)
+      .once("value")
+    ).val();
+    let { DContacts, DContactsKeyboard } = value;
 
-    contacts.forEach(contact => contactsList.push(contact.user_id));
-
-    const { users } = await ctx.MTProto.contactsGetContacts(
-      contactsList.join(",")
-    );
-    const DContacts = [];
-    const DContactsKeyboard = [];
-
-    users.forEach(DContact => {
-      if (DContact.first_name != null) {
-        if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
-          DContacts.push({
-            id: DContact.id,
-            access_hash: DContact.access_hash,
-            first_name: DContact.first_name,
-            phone: DContact.phone
-          });
-
-          DContactsKeyboard.push([
-            Markup.callbackButton(
-              DContact.first_name,
-              `contact@${DContact.first_name}@${DContact.id}@${
-                DContact.access_hash
-              }`
-            )
-          ]);
-        }
-      }
-    });
-
-    if (!DContacts.length) {
+    if (DContacts != null && DContactsKeyboard != null) {
       return {
-        DContactsKeyboard: undefined
+        DContacts,
+        DContactsKeyboard
+      };
+    } else {
+      const { contacts } = await ctx.MTProto.contactsGetContacts();
+      const contactsList = [];
+
+      DContacts = [];
+      DContactsKeyboard = [];
+
+      contacts.forEach(contact => contactsList.push(contact.user_id));
+
+      const { users } = await ctx.MTProto.contactsGetContacts(
+        contactsList.join(",")
+      );
+
+      users.forEach(DContact => {
+        if (DContact.first_name != null) {
+          if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
+            DContacts.push({
+              id: DContact.id,
+              access_hash: DContact.access_hash,
+              first_name: DContact.first_name,
+              phone: DContact.phone
+            });
+
+            DContactsKeyboard.push([
+              Markup.callbackButton(
+                DContact.first_name,
+                `contact@${DContact.first_name}@${DContact.id}@${
+                  DContact.access_hash
+                }`
+              )
+            ]);
+          }
+        }
+      });
+
+      if (!DContacts.length) {
+        return {
+          DContactsKeyboard: undefined
+        };
+      }
+
+      ctx.Database.ref(MTProtoConfig.sessionPath).update({
+        DContacts,
+        DContactsKeyboard
+      });
+
+      return {
+        DContacts,
+        DContactsKeyboard
       };
     }
-
-    ctx.Database.ref(MTProtoConfig.sessionPath).update({
-      DContacts
-    });
-
-    return {
-      DContacts,
-      DContactsKeyboard
-    };
   },
 
   cbSplitter: (input, type) => {
