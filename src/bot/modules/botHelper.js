@@ -74,96 +74,122 @@ const botHelper = {
   },
 
   DGroups: async (ctx, command, skip, offset = 0, limit = 70) => {
-    const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
-    const DGroups = [];
-    const DGroupsKeyboard = [];
+    let { DGroups } = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
+      "value"
+    )).val();
 
-    chats.forEach(DGroup => {
-      if (DGroup._ == "channel" && DGroup.title.match(/D:CODE/) == "D:CODE") {
-        DGroups.push({
-          _: DGroup._,
-          id: DGroup.id,
-          title: DGroup.title,
-          access_hash: DGroup.access_hash
-        });
+    if (DGroups != null) {
+      const DGroupsKeyboard = [];
 
-        switch (command) {
-          case "add": {
-            DGroupsKeyboard.push([
-              Markup.callbackButton(
-                DGroup.title,
-                `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
-              ),
-              Markup.callbackButton(
-                "❌",
-                `addGroup@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
-              )
-            ]);
+      DGroups.forEach(DGroup => {
+        botHelper.DGroupsModifier(DGroup, DGroupsKeyboard, command, skip);
+      });
 
-            break;
-          }
-
-          case "mergeFrom": {
-            DGroupsKeyboard.push([
-              Markup.callbackButton(
-                DGroup.title,
-                `mergeFrom@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
-              )
-            ]);
-
-            break;
-          }
-
-          case "mergeWith": {
-            if (skip != DGroup.title) {
-              DGroupsKeyboard.push([
-                Markup.callbackButton(
-                  DGroup.title,
-                  `mergeWith@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
-                )
-              ]);
-
-              break;
-            }
-
-            break;
-          }
-
-          default: {
-            DGroupsKeyboard.push([
-              Markup.callbackButton(
-                DGroup.title,
-                `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
-              )
-            ]);
-
-            break;
-          }
-        }
-      }
-    });
-
-    if (!DGroups.length) {
       return {
-        DGroupsKeyboard: undefined
+        DGroups,
+        DGroupsKeyboard
+      };
+    } else {
+      const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
+
+      const DGroupsKeyboard = [];
+      DGroups = [];
+
+      chats.forEach(DGroup => {
+        if (DGroup._ == "channel" && DGroup.title.match(/D:CODE/) == "D:CODE") {
+          DGroups.push({
+            _: DGroup._,
+            id: DGroup.id,
+            title: DGroup.title,
+            access_hash: DGroup.access_hash
+          });
+
+          botHelper.DGroupsModifier(DGroup, DGroupsKeyboard, command, skip);
+        }
+      });
+
+      DGroupsKeyboard.push([
+        Markup.callbackButton("Update groups 🔄", `update@groups`)
+      ]);
+
+      if (!DGroups.length) {
+        return {
+          DGroupsKeyboard: undefined
+        };
+      }
+
+      ctx.Database.ref(MTProtoConfig.sessionPath).update({
+        DGroups
+      });
+
+      return {
+        DGroups,
+        DGroupsKeyboard
       };
     }
+  },
 
-    ctx.Database.ref(MTProtoConfig.sessionPath).update({
-      DGroups
-    });
+  DGroupsModifier: (DGroup, DGroupsKeyboard, command, skip) => {
+    switch (command) {
+      case "add": {
+        DGroupsKeyboard.push([
+          Markup.callbackButton(
+            DGroup.title,
+            `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+          ),
+          Markup.callbackButton(
+            "❌",
+            `addGroup@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+          )
+        ]);
 
-    return {
-      DGroups,
-      DGroupsKeyboard
-    };
+        break;
+      }
+
+      case "mergeFrom": {
+        DGroupsKeyboard.push([
+          Markup.callbackButton(
+            DGroup.title,
+            `mergeFrom@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+          )
+        ]);
+
+        break;
+      }
+
+      case "mergeWith": {
+        if (skip != DGroup.title) {
+          DGroupsKeyboard.push([
+            Markup.callbackButton(
+              DGroup.title,
+              `mergeWith@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+            )
+          ]);
+
+          break;
+        }
+
+        break;
+      }
+
+      default: {
+        DGroupsKeyboard.push([
+          Markup.callbackButton(
+            DGroup.title,
+            `group@${DGroup.title}@${DGroup.id}@${DGroup.access_hash}`
+          )
+        ]);
+
+        break;
+      }
+    }
   },
 
   DContacts: async ctx => {
-    const value = (await ctx.Database
-      .ref(MTProtoConfig.sessionPath)
-      .once("value")
-    ).val();
+    const value = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
+      "value"
+    )).val();
+
     let { DContacts, DContactsKeyboard } = value;
 
     if (DContacts != null && DContactsKeyboard != null) {
@@ -172,56 +198,62 @@ const botHelper = {
         DContactsKeyboard
       };
     } else {
-      const { contacts } = await ctx.MTProto.contactsGetContacts();
-      const contactsList = [];
+      return botHelper.DContactsUpdate(ctx.Database, ctx.MTProto);
+    }
+  },
 
-      DContacts = [];
-      DContactsKeyboard = [];
+  DContactsUpdate: async (Database, MTProto) => {
+    const { contacts } = await MTProto.contactsGetContacts();
+    const contactsList = [];
 
-      contacts.forEach(contact => contactsList.push(contact.user_id));
+    const DContacts = [];
+    const DContactsKeyboard = [];
 
-      const { users } = await ctx.MTProto.contactsGetContacts(
-        contactsList.join(",")
-      );
+    contacts.forEach(contact => contactsList.push(contact.user_id));
 
-      users.forEach(DContact => {
-        if (DContact.first_name != null) {
-          if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
-            DContacts.push({
-              id: DContact.id,
-              access_hash: DContact.access_hash,
-              first_name: DContact.first_name,
-              phone: DContact.phone
-            });
+    const { users } = await MTProto.contactsGetContacts(contactsList.join(","));
 
-            DContactsKeyboard.push([
-              Markup.callbackButton(
-                DContact.first_name,
-                `contact@${DContact.first_name}@${DContact.id}@${
-                  DContact.access_hash
-                }`
-              )
-            ]);
-          }
+    users.forEach(DContact => {
+      if (DContact.first_name != null) {
+        if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
+          DContacts.push({
+            id: DContact.id,
+            access_hash: DContact.access_hash,
+            first_name: DContact.first_name,
+            phone: DContact.phone
+          });
+
+          DContactsKeyboard.push([
+            Markup.callbackButton(
+              DContact.first_name,
+              `contact@${DContact.first_name}@${DContact.id}@${
+                DContact.access_hash
+              }`
+            )
+          ]);
         }
-      });
-
-      if (!DContacts.length) {
-        return {
-          DContactsKeyboard: undefined
-        };
       }
+    });
 
-      ctx.Database.ref(MTProtoConfig.sessionPath).update({
-        DContacts,
-        DContactsKeyboard
-      });
+    DContactsKeyboard.push([
+      Markup.callbackButton("Update contacts 🔄", `update@contacts`)
+    ]);
 
+    if (!DContacts.length) {
       return {
-        DContacts,
-        DContactsKeyboard
+        DContactsKeyboard: undefined
       };
     }
+
+    Database.ref(MTProtoConfig.sessionPath).update({
+      DContacts,
+      DContactsKeyboard
+    });
+
+    return {
+      DContacts,
+      DContactsKeyboard
+    };
   },
 
   cbSplitter: (input, type) => {
@@ -239,6 +271,12 @@ const botHelper = {
           title: input.split("@")[1], // D:CODE - team
           id: input.split("@")[2], // 252362085
           access_hash: input.split("@")[3] // 3539057495372134628
+        };
+      }
+
+      case "update": {
+        return {
+          type: input.split("@")[1]
         };
       }
     }

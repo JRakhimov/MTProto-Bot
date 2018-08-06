@@ -220,6 +220,32 @@ bot.action(/mergeWith@/, async ctx => {
   await ctx.editMessageText("Done✨");
 });
 
+bot.action(/update@/, async ctx => {
+  const { type } = ctx.Helper.cbSplitter(ctx.match.input, "update");
+
+  if (type === "contacts") {
+    const { DContactsKeyboard } = await ctx.Helper.DContactsUpdate(
+      ctx.Database,
+      ctx.MTProto
+    );
+
+    if (DContactsKeyboard != null) {
+      ctx
+        .editMessageReplyMarkup({ inline_keyboard: DContactsKeyboard })
+        .then(() => {
+          ctx.answerCbQuery("Contacts updated");
+        })
+        .catch(({ description }) => {
+          if (description === "Bad Request: message is not modified") {
+            ctx.answerCbQuery("Contacts is up to date");
+          }
+        });
+    } else {
+      ctx.replyWithHTML('Contacts with prefix <b>"D:CODE"</b> not found!');
+    }
+  }
+});
+
 bot.catch(err => {
   console.log(err);
 });
