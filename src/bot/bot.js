@@ -243,6 +243,17 @@ bot.action(/update@/, async ctx => {
     } else {
       ctx.replyWithHTML('Contacts with prefix <b>"D:CODE"</b> not found!');
     }
+  } else if (type === "groups") {
+    const { DGroupsKeyboard } = await ctx.Helper.DGroupsUpdate(
+      ctx.Database,
+      ctx.MTProto
+    );
+
+    if (DGroupsKeyboard != null) {
+      ctx.editMessageText(
+        "Groups updated successfully. You can continue using the bot :)"
+      );
+    }
   }
 });
 
