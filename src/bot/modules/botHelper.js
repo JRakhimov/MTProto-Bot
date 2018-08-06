@@ -73,7 +73,7 @@ const botHelper = {
     return newKeyboard;
   },
 
-  DGroups: async (ctx, command, skip, offset = 0, limit = 70) => {
+  DGroups: async (ctx, command, skip) => {
     let { DGroups } = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
       "value"
     )).val();
@@ -85,48 +85,56 @@ const botHelper = {
         botHelper.DGroupsModifier(DGroup, DGroupsKeyboard, command, skip);
       });
 
+      DGroupsKeyboard.push([
+        Markup.callbackButton("Update groups 🔄", `update@groups`)
+      ]);
+
       return {
         DGroups,
         DGroupsKeyboard
       };
     } else {
-      const { chats } = await ctx.MTProto.messagesGetDialogs(offset, limit);
+      return botHelper.DGroupsUpdate(ctx.Database, ctx.MTProto);
+    }
+  },
 
-      const DGroupsKeyboard = [];
-      DGroups = [];
+  DGroupsUpdate: async (Database, MTProto, command, skip) => {
+    const { chats } = await MTProto.messagesGetDialogs(0, 70);
 
-      chats.forEach(DGroup => {
-        if (DGroup._ == "channel" && DGroup.title.match(/D:CODE/) == "D:CODE") {
-          DGroups.push({
-            _: DGroup._,
-            id: DGroup.id,
-            title: DGroup.title,
-            access_hash: DGroup.access_hash
-          });
+    const DGroupsKeyboard = [];
+    const DGroups = [];
 
-          botHelper.DGroupsModifier(DGroup, DGroupsKeyboard, command, skip);
-        }
-      });
+    chats.forEach(DGroup => {
+      if (DGroup._ == "channel" && DGroup.title.match(/D:CODE/) == "D:CODE") {
+        DGroups.push({
+          _: DGroup._,
+          id: DGroup.id,
+          title: DGroup.title,
+          access_hash: DGroup.access_hash
+        });
 
-      DGroupsKeyboard.push([
-        Markup.callbackButton("Update groups 🔄", `update@groups`)
-      ]);
-
-      if (!DGroups.length) {
-        return {
-          DGroupsKeyboard: undefined
-        };
+        botHelper.DGroupsModifier(DGroup, DGroupsKeyboard, command, skip);
       }
+    });
 
-      ctx.Database.ref(MTProtoConfig.sessionPath).update({
-        DGroups
-      });
+    DGroupsKeyboard.push([
+      Markup.callbackButton("Update groups 🔄", `update@groups`)
+    ]);
 
+    if (!DGroups.length) {
       return {
-        DGroups,
-        DGroupsKeyboard
+        DGroupsKeyboard: undefined
       };
     }
+
+    Database.ref(MTProtoConfig.sessionPath).update({
+      DGroups
+    });
+
+    return {
+      DGroups,
+      DGroupsKeyboard
+    };
   },
 
   DGroupsModifier: (DGroup, DGroupsKeyboard, command, skip) => {
