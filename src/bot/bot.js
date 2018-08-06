@@ -136,34 +136,42 @@ bot.action(/addGroup@/, async ctx => {
   await ctx.editMessageReplyMarkup({ inline_keyboard: newKeyboard });
 });
 
-bot.action(/add/, async ctx => {
+bot.action(/add/, ctx => {
   ctx.answerCbQuery("Save and Add ✨");
 
-  ctx.session.tempKeyboard.forEach(async group => {
-    const isChecked = group[1].text === "✅";
+  const usersToAdd = [];
 
-    if (isChecked) {
-      const channelID = group[1].callback_data.split("@")[2]; // 252362085
-      const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
+  ctx.session.tempKeyboard.forEach(group => {
+    if (group[1] != null) {
+      const isChecked = group[1].text === "✅";
 
-      await ctx.MTProto.channelsInviteToChannel(
-        Number(channelID),
-        channelHash,
-        [
-          {
-            _: "inputUser",
-            user_id: Number(ctx.session.addContactInfo.user_id),
-            access_hash: ctx.session.addContactInfo.access_hash
-          }
-        ]
-      ).catch(err => ctx.Helper.errHandler(ctx, err));
+      if (isChecked) {
+        const channelID = group[1].callback_data.split("@")[2]; // 252362085
+        const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
+
+        usersToAdd.push(
+          ctx.MTProto.channelsInviteToChannel(Number(channelID), channelHash, [
+            {
+              _: "inputUser",
+              user_id: Number(ctx.session.addContactInfo.user_id),
+              access_hash: ctx.session.addContactInfo.access_hash
+            }
+          ])
+        );
+      }
     }
   });
 
-  delete ctx.session.addContactInfo;
-  delete ctx.session.tempKeyboard;
+  Promise.all(usersToAdd)
+    .then((response) => {
+      console.log(response)
+      
+      delete ctx.session.addContactInfo;
+      delete ctx.session.tempKeyboard;
 
-  await ctx.editMessageText("Done✨");
+      ctx.editMessageText("Done✨");
+    })
+    .catch(err => ctx.Helper.errHandler(ctx, err));
 });
 
 bot.action(/mergeFrom@/, async ctx => {

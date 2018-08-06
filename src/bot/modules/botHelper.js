@@ -46,6 +46,8 @@ const botHelper = {
 
   keyboardSwitcher: (keyboard, callbackData) => {
     const newKeyboard = keyboard.map(item => {
+      if (item[1] == null) return item;
+
       const itemTitle = item[1].callback_data.split("@")[1];
 
       if (itemTitle === callbackData.title) {
