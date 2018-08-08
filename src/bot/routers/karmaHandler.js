@@ -4,16 +4,22 @@ const karma = new Router(({ update }) => {
   const { entities } = update.message;
   const { text } = update.message;
 
-  if (entities == null || (entities[0].type !== "mention" || !text)) {
+  const regExp = /@([A-Z])\w+ [+-][+-]/g;
+
+  if (
+    entities == null ||
+    (entities[0].type !== "mention" || !text.match(regExp))
+  ) {
     return;
   }
 
-  const parts = text.split("@");
+  console.log(text.match(regExp));
 
   return {
     route: "username",
     state: {
-      mentionedUser: parts[1].split(" ")[0]
+      mentionedUser: text.split("@")[1].split(" ")[0],
+      full: text.match(regExp)[0]
     }
   };
 });
