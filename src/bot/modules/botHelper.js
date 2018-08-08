@@ -44,13 +44,13 @@ const botHelper = {
     );
   },
 
-  keyboardSwitcher: (keyboard, callbackData) => {
+  keyboardSwitcher: (keyboard, groupTitle) => {
     const newKeyboard = keyboard.map(item => {
       if (item[1] == null) return item;
 
       const itemTitle = item[1].callback_data.split("@")[1];
 
-      if (itemTitle === callbackData.title) {
+      if (itemTitle === groupTitle) {
         const editedItem = item;
 
         editedItem[1] = {
@@ -323,13 +323,13 @@ const botHelper = {
 
   errHandler: (ctx, err) => {
     console.log(err);
-    helper.toAllAdmins(
+    botHelper.toAllAdmins(
       ctx,
-      `<b>An error has been occurred in our bot. Here is details:</b>\n👨‍✈️<code>${JSON.stringify(
+      `<b>An error has been occurred in our bot. Here is details:</b>\n️<code>${JSON.stringify(
         err,
         undefined,
         2
-      )}</code> ☠️`
+      )}</code>`
     );
   }
 };
