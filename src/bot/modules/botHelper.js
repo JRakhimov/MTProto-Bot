@@ -275,7 +275,9 @@ const botHelper = {
       "value"
     )).val();
 
-    if (ctx.Helper.isAdmin(ctx.chat.id)) {
+    const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
+
+    if (ctx.Helper.isAdmin(chatID)) {
       if (authData != null && authData.signedIn == true) {
         await next(ctx);
       } else if (ctx.message.text !== "🎫 Log in") {

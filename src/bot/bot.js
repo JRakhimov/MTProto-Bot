@@ -10,8 +10,9 @@ const botHelper = require("./modules/botHelper");
 const scenes = require("./scenes/scenes");
 const database = require("../database");
 
-const groups = require("./routers/callbackGroups"); // Routers
-const contacts = require("./routers/callbackContacts");
+const contacts = require("./routers/callbackContacts"); // Routers
+const groups = require("./routers/callbackGroups");
+const karma = require("./routers/karmaHandler");
 
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
@@ -27,8 +28,9 @@ bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use((ctx, next) => ctx.Helper.middleware(ctx, next));
 
-bot.on("callback_query", groups);
 bot.on("callback_query", contacts);
+bot.on("callback_query", groups);
+bot.on("message", karma);
 
 bot.start(ctx => {
   ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
