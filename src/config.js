@@ -5,7 +5,7 @@ require("dotenv").config();
 exports.botConfig = {
   token: process.env.BOT_TOKEN,
   url: process.env.HOST,
-  scenesTTL: 300, // LifeCycle of scenes in seconds
+  scenesTTL: 120, // LifeCycle of scenes in seconds
 
   admins: {
     rakhimov_j: 379086434,
@@ -42,20 +42,20 @@ exports.MTProtoConfig = {
   },
 
   server: {
-    webogram: true,
+    webogram: false,
+    dev: true, // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
     dcList: [
-      {
-        id: 2,
-        host: "149.154.167.50", // Production
-        port: 443
-      },
       {
         id: 2,
         host: "149.154.167.40", // Test
         port: 443
+      },
+      {
+        id: 2,
+        host: "149.154.167.50", // Production
+        port: 443
       }
-    ],
-    dev: process.env.IS_DEV == "true" ? true : false // For testing in dev servers you should use TelegramBeta (https://t.me/tgrambeta)
+    ]
   }
 };
 
