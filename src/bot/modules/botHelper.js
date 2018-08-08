@@ -266,32 +266,6 @@ const botHelper = {
     };
   },
 
-  cbSplitter: (input, type) => {
-    switch (type) {
-      case "contact": {
-        return {
-          name: input.split("@")[1], // D:CODE RJ
-          user_id: input.split("@")[2], // 127393
-          access_hash: input.split("@")[3] // 2443773757594061248
-        };
-      }
-
-      case "group": {
-        return {
-          title: input.split("@")[1], // D:CODE - team
-          id: input.split("@")[2], // 252362085
-          access_hash: input.split("@")[3] // 3539057495372134628
-        };
-      }
-
-      case "update": {
-        return {
-          type: input.split("@")[1]
-        };
-      }
-    }
-  },
-
   isAdmin: chatID => {
     return Object.values(botConfig.admins).includes(chatID);
   },

@@ -10,6 +10,9 @@ const botHelper = require("./modules/botHelper");
 const scenes = require("./scenes/scenes");
 const database = require("../database");
 
+const groups = require("./routers/callbackGroups"); // Routers
+const contacts = require("./routers/callbackContacts");
+
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
 
@@ -24,7 +27,10 @@ bot.use(rateLimit(botConfig.rateLimit));
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
 bot.use((ctx, next) => ctx.Helper.middleware(ctx, next));
 
-bot.start(async ctx => {
+bot.on("callback_query", groups);
+bot.on("callback_query", contacts);
+
+bot.start(ctx => {
   ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
 });
 
@@ -93,143 +99,8 @@ bot.hears("😿 Log Out", ctx => {
   ctx.Helper.authKeyboard(ctx, "Logged out 🤷‍♂️");
 });
 
-bot.action(/contact@/, async ctx => {
-  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "contact");
-
-  ctx.answerCbQuery(cbData.name);
-  ctx.session.addContactInfo = cbData;
-
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, "add").catch(err =>
-    ctx.Helper.errHandler(ctx, err)
-  );
-
-  await ctx.deleteMessage();
-
-  await ctx.Helper.replyWithInline(
-    ctx,
-    "Select the groups you want to add the participant:",
-    DGroupsKeyboard
-  );
-});
-
-bot.action(/group@/, async ctx => {
-  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-
-  ctx.answerCbQuery(cbData.title);
-});
-
-bot.action(/addGroup@/, async ctx => {
-  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-
-  ctx.answerCbQuery(cbData.title);
-
-  ctx.session.tempKeyboard =
-    ctx.session.tempKeyboard == null
-      ? (await ctx.Helper.DGroups(ctx, "add")).DGroupsKeyboard
-      : ctx.session.tempKeyboard;
-
-  const newKeyboard = ctx.Helper.keyboardSwitcher(
-    ctx.session.tempKeyboard,
-    cbData
-  );
-
-  await ctx.editMessageReplyMarkup({ inline_keyboard: newKeyboard });
-});
-
-bot.action(/add/, ctx => {
-  ctx.answerCbQuery("Save and Add ✨");
-
-  const usersToAdd = [];
-
-  ctx.session.tempKeyboard.forEach(group => {
-    if (group[1] != null) {
-      const isChecked = group[1].text === "✅";
-
-      if (isChecked) {
-        const channelID = group[1].callback_data.split("@")[2]; // 252362085
-        const channelHash = group[1].callback_data.split("@")[3]; // 3539057495372134628
-
-        usersToAdd.push(
-          ctx.MTProto.channelsInviteToChannel(Number(channelID), channelHash, [
-            {
-              _: "inputUser",
-              user_id: Number(ctx.session.addContactInfo.user_id),
-              access_hash: ctx.session.addContactInfo.access_hash
-            }
-          ])
-        );
-      }
-    }
-  });
-
-  Promise.all(usersToAdd)
-    .then((response) => {
-      console.log(response)
-      
-      delete ctx.session.addContactInfo;
-      delete ctx.session.tempKeyboard;
-
-      ctx.editMessageText("Done✨");
-    })
-    .catch(err => ctx.Helper.errHandler(ctx, err));
-});
-
-bot.action(/mergeFrom@/, async ctx => {
-  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-
-  ctx.answerCbQuery(cbData.title);
-
-  const { users } = await ctx.MTProto.channelsGetParticipants(
-    cbData.id,
-    cbData.access_hash,
-    0,
-    30
-  );
-
-  ctx.session.originUsers = users
-    .map(user => {
-      if (user.self == null) {
-        return {
-          _: "inputUser",
-          user_id: user.id,
-          access_hash: user.access_hash
-        };
-      }
-    })
-    .filter(user => user != null);
-
-  const { DGroupsKeyboard } = await ctx.Helper.DGroups(
-    ctx,
-    "mergeWith",
-    cbData.title
-  );
-
-  await ctx.deleteMessage();
-  await ctx.Helper.replyWithInline(
-    ctx,
-    "Select the group you want to add the participants:",
-    DGroupsKeyboard
-  );
-});
-
-bot.action(/mergeWith@/, async ctx => {
-  const cbData = ctx.Helper.cbSplitter(ctx.match.input, "group");
-
-  ctx.answerCbQuery(cbData.title);
-
-  await ctx.MTProto.channelsInviteToChannel(
-    Number(cbData.id),
-    cbData.access_hash,
-    ctx.session.originUsers
-  );
-
-  delete ctx.session.originUsers;
-
-  await ctx.editMessageText("Done✨");
-});
-
-bot.action(/update@/, async ctx => {
-  const { type } = ctx.Helper.cbSplitter(ctx.match.input, "update");
+bot.action(/update/, async ctx => {
+  const type = ctx.match.input.split("@")[1];
 
   if (type === "contacts") {
     const { DContactsKeyboard } = await ctx.Helper.DContactsUpdate(
