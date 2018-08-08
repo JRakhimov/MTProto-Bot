@@ -33,10 +33,16 @@ class MTProtoClient {
           this.__errors = 0;
           const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
+          console.log("Here is config:");
+          console.log(config);
 
           return resolve(res);
         })
         .catch(err => {
+          console.log(`Response time for ${query} is ${stop}ms`);
+          console.log("Here is config:");
+          console.log(config);
+
           if (this.__errors >= 3) {
             return resolve({ code: 429, message: "Flood" });
           }

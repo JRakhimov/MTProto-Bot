@@ -5,6 +5,11 @@ const { MTProtoConfig } = require("../../../config");
 
 const saveCode = new Composer();
 
+saveCode.hears("leave", ctx => {
+  ctx.reply("Leaving from scene...");
+  return ctx.scene.leave();
+});
+
 saveCode.on("text", async ctx => {
   const code = ctx.message.text;
 
