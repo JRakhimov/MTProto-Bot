@@ -278,7 +278,7 @@ const botHelper = {
     const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
 
     if (ctx.Helper.isAdmin(chatID)) {
-      if (authData != null && authData.signedIn == true) {
+      if (authData != null && authData.signedIn) {
         await next(ctx);
       } else if (ctx.message.text !== "🎫 Log in") {
         ctx.Helper.authKeyboard(

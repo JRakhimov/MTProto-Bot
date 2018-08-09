@@ -6,6 +6,7 @@ exports.botConfig = {
   token: process.env.BOT_TOKEN,
   url: process.env.HOST,
   scenesTTL: 120, // LifeCycle of scenes in seconds
+  karmaPath: "/karmaData",
 
   admins: {
     rakhimov_j: 379086434,
