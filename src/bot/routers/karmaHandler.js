@@ -1,10 +1,15 @@
 const Router = require("telegraf/router");
+const moment = require("moment");
+
+const { botConfig } = require("../../config");
 
 const karma = new Router(({ update }) => {
   const { entities } = update.message;
   const { text } = update.message;
 
-  const regExp = /@([A-Z])\w+ [+-][+-]/g;
+  const regExpPlus = /@([A-Z])\w+ [+][+]/g;
+  const regExpMinus = /@([A-Z])\w+ [—]/g;
+  const regExp = text.match(regExpPlus) == null ? regExpMinus : regExpPlus;
 
   if (
     entities == null ||
@@ -13,19 +18,48 @@ const karma = new Router(({ update }) => {
     return;
   }
 
-  console.log(text.match(regExp));
+  const karmaData = {
+    username: text
+      .match(regExp)[0]
+      .split("@")[1]
+      .split(" ")[0],
+    command: text
+      .match(regExp)[0]
+      .split("@")[1]
+      .split(" ")[1]
+  };
 
   return {
     route: "username",
     state: {
-      mentionedUser: text.split("@")[1].split(" ")[0],
-      full: text.match(regExp)[0]
+      mentionedUser: karmaData.username,
+      command: karmaData.command
     }
   };
 });
 
 karma.on("username", ctx => {
-  ctx.reply(`@${ctx.state.mentionedUser}`);
+  const CURRENT_MONTH = moment().format("MMMM");
+
+  ctx.MTProto.contactsResolveUsername(ctx.state.mentionedUser)
+    .then(async user => {
+      const chatID = user.peer.user_id;
+
+      const userData = ctx.Database.ref(
+        `${botConfig.karmaPath}/${CURRENT_MONTH}/${chatID}`
+      );
+
+      let userKarma = (await userData.once("value")).val();
+
+      userKarma =
+        ctx.state.command === "++" ? (userKarma += 1) : (userKarma -= 1);
+      userData.set(userKarma);
+
+      ctx.reply(`@${ctx.state.mentionedUser}: ${userKarma}`);
+    })
+    .catch(err => {
+      ctx.reply(`User with username: ${ctx.state.mentionedUser} not found!`);
+    });
 });
 
 module.exports = karma;
