@@ -39,6 +39,7 @@ class MTProtoClient {
           return resolve(res);
         })
         .catch(err => {
+          const stop = new Date() - start;
           console.log(`Response time for ${query} is ${stop}ms`);
           console.log("Here is config:");
           console.log(config);
@@ -48,7 +49,8 @@ class MTProtoClient {
           }
 
           this.__errors += 1;
-          console.log(err, this.__errors);
+          console.log(err);
+          console.log(`Errors: ${this.__errors}`);
 
           return reject(err);
         });
@@ -235,6 +237,22 @@ class MTProtoClient {
     };
 
     const response = await this.request("contacts.importContacts", config);
+
+    return response;
+  }
+
+  /**
+   * Returns info about user by Username
+   *
+   * @name contactsResolveUsername
+   * @function
+   * @param {String} username
+   */
+
+  async contactsResolveUsername(username) {
+    const config = { username };
+
+    const response = await this.request("contacts.resolveUsername", config);
 
     return response;
   }
