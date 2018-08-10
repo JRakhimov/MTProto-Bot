@@ -230,6 +230,7 @@ const botHelper = {
             id: DContact.id,
             access_hash: DContact.access_hash,
             first_name: DContact.first_name,
+            username: DContact.username,
             phone: DContact.phone
           });
 

@@ -31,8 +31,6 @@ general.hears("/karma top", async ctx => {
     if (a[1] < b[1]) return 1;
   });
 
-  console.log(sorted);
-
   const topMessage = sorted.map(async user => {
     const { username } = await ctx.telegram.getChat(Number(user[0]));
     if (username != null) {

@@ -1,9 +1,9 @@
 const Router = require("telegraf/router");
 const moment = require("moment");
 
-const { botConfig } = require("../../config");
+const { botConfig, MTProtoConfig } = require("../../config");
 
-const karma = new Router(({ update }) => {
+const karma = new Router(async ({ update, Database }) => {
   const { entities } = update.message;
   const { text } = update.message;
 
@@ -29,13 +29,26 @@ const karma = new Router(({ update }) => {
       .split(" ")[1]
   };
 
-  return {
-    route: "username",
-    state: {
-      mentionedUser: karmaData.username,
-      command: karmaData.command
-    }
-  };
+  let res;
+
+  await Database.ref(MTProtoConfig.sessionPath)
+    .once("value")
+    .then(response => response.val())
+    .then(({ DContacts }) => {
+      DContacts.forEach(async DContact => {
+        if (karmaData.username === DContact.username) {
+          res = {
+            route: "username",
+            state: {
+              mentionedUser: karmaData.username,
+              command: karmaData.command
+            }
+          };
+        }
+      });
+    });
+
+  return res;
 });
 
 karma.on("username", ctx => {
