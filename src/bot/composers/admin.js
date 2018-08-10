@@ -1,37 +1,24 @@
-const Router = require("telegraf/router");
+const Composer = require("telegraf/composer");
 
 const { MTProtoConfig } = require("../../config");
 
-const admin = new Router(async ctx => {
-  const authData = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
-    "value"
-  )).val();
+const admin = new Composer();
 
-  const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
-
-  if (ctx.Helper.isAdmin(chatID)) {
-    if (authData != null && authData.signedIn) {
-      return { route: ctx.message.text };
-    } else if (ctx.message.text !== "🎫 Log in") {
-      ctx.Helper.authKeyboard(
-        ctx,
-        "We detected that you are not logged, please log in with command => 🎫 Log in"
-      );
-    } else {
-      return { route: ctx.message.text };
-    }
+admin.use((ctx, next) => {
+  if (ctx.chat.type === "private") {
+    return next(ctx);
   }
 });
 
-admin.on("/start", ctx => {
+admin.start(ctx => {
   ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
 });
 
-admin.on("🎫 Log in", ctx => {
+admin.hears("🎫 Log in", ctx => {
   ctx.scene.enter("authScene");
 });
 
-admin.on("👨‍👨‍👧‍👦 Groups", async ctx => {
+admin.hears("👨‍👨‍👧‍👦 Groups", async ctx => {
   const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx);
 
   if (DGroupsKeyboard != null) {
@@ -41,7 +28,7 @@ admin.on("👨‍👨‍👧‍👦 Groups", async ctx => {
   }
 });
 
-admin.on("🔀 Merge groups", async ctx => {
+admin.hears("🔀 Merge groups", async ctx => {
   const { DGroupsKeyboard } = await ctx.Helper.DGroups(ctx, "mergeFrom");
 
   if (DGroupsKeyboard != null) {
@@ -55,7 +42,7 @@ admin.on("🔀 Merge groups", async ctx => {
   }
 });
 
-admin.on("👥 Contacts", async ctx => {
+admin.hears("👥 Contacts", async ctx => {
   const { DContactsKeyboard } = await ctx.Helper.DContacts(ctx);
 
   if (DContactsKeyboard != null) {
@@ -65,14 +52,14 @@ admin.on("👥 Contacts", async ctx => {
   }
 });
 
-admin.on("👤 New contact", ctx => {
+admin.hears("👤 New contact", ctx => {
   ctx.scene.enter("addContactScene");
 });
 
-admin.on("🤓 Profile", async ctx => {
-  const { Me } = (await database
-    .ref(MTProtoConfig.sessionPath)
-    .once("value")).val();
+admin.hears("🤓 Profile", async ctx => {
+  const { Me } = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
+    "value"
+  )).val();
 
   const profileMessage = [
     `👩 <b>About Me</b> 👨\n`,
@@ -86,7 +73,7 @@ admin.on("🤓 Profile", async ctx => {
   ctx.replyWithHTML(profileMessage.join("\n"));
 });
 
-admin.on("😿 Log Out", ctx => {
+admin.hears("😿 Log Out", ctx => {
   ctx.Database.ref(MTProtoConfig.sessionPath).remove();
 
   ctx.Helper.authKeyboard(ctx, "Logged out 🤷‍♂️");

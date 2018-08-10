@@ -2,6 +2,7 @@
 
 const Telegraf = require("telegraf"); // Telegraf Dependencies
 const session = require("telegraf/session");
+const Composer = require("telegraf/composer");
 const rateLimit = require("telegraf-ratelimit");
 
 const { CronJob } = require("cron"); // Other Dependencies
@@ -13,11 +14,13 @@ const botHelper = require("./modules/botHelper");
 const scenes = require("./scenes/scenes");
 const database = require("../database");
 
+const generalComposer = require("./composers/general"); // Composers
+const adminComposer = require("./composers/admin");
+
 const contacts = require("./routers/callbackContacts"); // Routers
 const updates = require("./routers/callbackUpdates");
 const groups = require("./routers/callbackGroups");
 const karma = require("./routers/karmaHandler");
-const admin = require("./routers/adminHandler");
 
 const MTProto = new MTProtoClient(MTProtoConfig.api_id, MTProtoConfig.api_hash); // MTProto init
 const bot = new Telegraf(botConfig.token, botConfig.telegraf); // Telegraf init
@@ -38,25 +41,19 @@ bot.use(session());
 // bot.use(Telegraf.log());
 bot.use(scenes.middleware());
 bot.use(rateLimit(botConfig.rateLimit));
-bot.telegram.setWebhook(`${botConfig.url}/bot`);
 
 bot.on("callback_query", contacts);
 bot.on("callback_query", updates);
 bot.on("callback_query", groups);
-bot.on("message", admin);
 bot.on("message", karma);
 
-bot.hears("/karma me", async ctx => {
-  const CURRENT_MONTH = moment().format("MMMM");
-  const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
-  const myKarma = (await ctx.Database.ref(
-    `${botConfig.karmaPath}/${CURRENT_MONTH}/${862341}`
-  ).once("value")).val();
-  ctx.reply(`Your karma for ${CURRENT_MONTH} is ${myKarma || 0}`);
-});
+bot.use(generalComposer);
+bot.use(Composer.acl(botConfig.admins, adminComposer));
 
 bot.catch(err => {
   console.log(err);
 });
+
+bot.telegram.setWebhook(`${botConfig.url}/bot`);
 
 module.exports = bot;
