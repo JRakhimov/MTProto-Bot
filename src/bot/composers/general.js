@@ -5,23 +5,23 @@ const { botConfig } = require("../../config");
 
 const general = new Composer();
 
-general.hears("/karma me", async ctx => {
+general.hears("/karmaMe", async ctx => {
   const CURRENT_MONTH = moment().format("MMMM");
   const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
   const myKarma = (await ctx.Database.ref(
-    `${botConfig.karmaPath}/${CURRENT_MONTH}/${862341}`
+    `${botConfig.karmaPath}/${CURRENT_MONTH}/${127393}`
   ).once("value")).val();
   ctx.reply(`Your karma for ${CURRENT_MONTH} is ${myKarma || 0}`);
 });
 
-general.hears("/karma top", async ctx => {
+general.hears("/karmaTop", async ctx => {
   const CURRENT_MONTH = moment().format("MMMM");
   // const allKarma = (await ctx.Database.ref(
   //   `${botConfig.karmaPath}/${CURRENT_MONTH}/`
   // ).once("value")).val();
 
   const allKarma = {
-    379086434: 30,
+    379086434: 3,
     82493329: 7,
     468716679: 12
   };
