@@ -8,11 +8,7 @@ exports.botConfig = {
   scenesTTL: 120, // LifeCycle of scenes in seconds
   karmaPath: "/karmaData",
 
-  admins: {
-    rakhimov_j: 379086434,
-    monitoringe: 82493329,
-    admin: 468716679
-  }, // Telegram IDs of admins
+  admins: [379086434, 82493329, 468716679],
 
   rateLimit: {
     window: 1, // Requests

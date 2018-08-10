@@ -266,33 +266,8 @@ const botHelper = {
     };
   },
 
-  isAdmin: chatID => {
-    return Object.values(botConfig.admins).includes(chatID);
-  },
-
-  middleware: async (ctx, next) => {
-    const authData = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
-      "value"
-    )).val();
-
-    const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
-
-    if (ctx.Helper.isAdmin(chatID)) {
-      if (authData != null && authData.signedIn) {
-        await next(ctx);
-      } else if (ctx.message.text !== "🎫 Log in") {
-        ctx.Helper.authKeyboard(
-          ctx,
-          "We detected that you are not logged, please log in with command => 🎫 Log in"
-        );
-      } else {
-        await next(ctx);
-      }
-    }
-  },
-
   toAllAdmins: (ctx, msgText) => {
-    Object.values(botConfig.admins).forEach(adminChatID => {
+    botConfig.admins.forEach(adminChatID => {
       ctx.telegram.sendMessage(adminChatID, msgText, Extra.HTML());
     });
   },
