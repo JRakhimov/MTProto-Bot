@@ -50,9 +50,7 @@ bot.on("message", karma);
 bot.use(generalComposer);
 bot.use(Composer.acl(botConfig.admins, adminComposer));
 
-bot.catch(err => {
-  console.log(err);
-});
+bot.catch(err => console.log(err));
 
 bot.telegram.setWebhook(`${botConfig.url}/bot`);
 

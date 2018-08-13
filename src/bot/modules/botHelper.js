@@ -75,6 +75,17 @@ const botHelper = {
     return newKeyboard;
   },
 
+  usernameResolver: (Database, username) => {
+    return Database.ref(MTProtoConfig.sessionPath)
+      .once("value")
+      .then(response => response.val())
+      .then(({ DContacts }) => {
+        return DContacts.find(DContact => {
+          return username === DContact.username;
+        });
+      });
+  },
+
   DGroups: async (ctx, command, skip) => {
     let { DGroups } = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
       "value"
@@ -101,7 +112,7 @@ const botHelper = {
   },
 
   DGroupsUpdate: async (Database, MTProto, command, skip) => {
-    const { chats } = await MTProto.messagesGetDialogs(0, 70);
+    const { chats } = await MTProto.messagesGetDialogs(0, 100);
 
     const DGroupsKeyboard = [];
     const DGroups = [];
@@ -223,6 +234,12 @@ const botHelper = {
 
     const { users } = await MTProto.contactsGetContacts(contactsList.join(","));
 
+    const { Me } = (await Database.ref(MTProtoConfig.sessionPath).once(
+      "value"
+    )).val();
+
+    DContacts.push(Me);
+
     users.forEach(DContact => {
       if (DContact.first_name != null) {
         if (DContact.first_name.match(/D:CODE/) == "D:CODE") {
@@ -230,7 +247,7 @@ const botHelper = {
             id: DContact.id,
             access_hash: DContact.access_hash,
             first_name: DContact.first_name,
-            username: DContact.username,
+            username: DContact.username || "undefined",
             phone: DContact.phone
           });
 

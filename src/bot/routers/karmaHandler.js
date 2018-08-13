@@ -29,55 +29,41 @@ const karma = new Router(async ({ update, Database }) => {
       .split(" ")[1]
   };
 
-  let res;
-
-  await Database.ref(MTProtoConfig.sessionPath)
-    .once("value")
-    .then(response => response.val())
-    .then(({ DContacts }) => {
-      DContacts.forEach(async DContact => {
-        if (karmaData.username === DContact.username) {
-          res = {
-            route: "username",
-            state: {
-              mentionedUser: karmaData.username,
-              command: karmaData.command
-            }
-          };
-        }
-      });
-    });
-
-  return res;
+  return {
+    route: "username",
+    state: {
+      mentionedUser: karmaData.username,
+      command: karmaData.command
+    }
+  };
 });
 
 karma.on("username", ctx => {
   const CURRENT_MONTH = moment().format("MMMM");
   const fromID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
 
-  ctx.MTProto.contactsResolveUsername(ctx.state.mentionedUser)
-    .then(async user => {
-      const chatID = user.peer.user_id;
-
-      if (fromID != chatID) {
+  ctx.Helper.usernameResolver(ctx.Database, ctx.state.mentionedUser).then(
+    async userID => {
+      if (userID == null) {
+        ctx.reply(`User with username: ${ctx.state.mentionedUser} not found!`);
+      } else if (fromID === userID.id) {
+        ctx.reply("You can't raise your own karma!");
+      } else {
         const userData = ctx.Database.ref(
-          `${botConfig.karmaPath}/${CURRENT_MONTH}/${chatID}`
+          `${botConfig.karmaPath}/${CURRENT_MONTH}/${userID.id}`
         );
 
         let userKarma = (await userData.once("value")).val();
 
         userKarma =
           ctx.state.command === "++" ? (userKarma += 1) : (userKarma -= 1);
+
         userData.set(userKarma);
 
         ctx.reply(`@${ctx.state.mentionedUser}: ${userKarma}`);
-      } else {
-        ctx.reply("You can't raise your own karma!");
       }
-    })
-    .catch(err => {
-      ctx.reply(`User with username: ${ctx.state.mentionedUser} not found!`);
-    });
+    }
+  );
 });
 
 module.exports = karma;
