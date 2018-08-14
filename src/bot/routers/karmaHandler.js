@@ -47,7 +47,7 @@ karma.on("username", ctx => {
       if (userID == null) {
         ctx.reply(`User with username: ${ctx.state.mentionedUser} not found!`);
       } else if (fromID === userID.id) {
-        ctx.reply("You can't raise your own karma!");
+        ctx.reply("You can't edit your own karma!");
       } else {
         const userData = ctx.Database.ref(
           `${botConfig.karmaPath}/${CURRENT_MONTH}/${userID.id}`

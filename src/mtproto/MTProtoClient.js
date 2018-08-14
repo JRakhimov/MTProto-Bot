@@ -56,7 +56,7 @@ class MTProtoClient {
         });
 
       setTimeout(() => {
-        return reject({
+        return resolve({
           code: 500,
           message: "Timeout"
         });
