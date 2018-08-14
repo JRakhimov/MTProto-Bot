@@ -2,6 +2,7 @@
 
 const Markup = require("telegraf/markup");
 const Extra = require("telegraf/extra");
+const moment = require("moment");
 
 const { botConfig, MTProtoConfig } = require("../../config");
 
@@ -319,6 +320,15 @@ const botHelper = {
       DContacts,
       DContactsKeyboard
     };
+  },
+
+  isAdmin: chatID => {
+    const result = botConfig.admins.find(admin => {
+      return admin === chatID;
+    });
+
+    if (result) return true;
+    else return false;
   },
 
   toAllAdmins: (ctx, msgText) => {

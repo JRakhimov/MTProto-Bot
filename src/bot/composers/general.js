@@ -5,6 +5,19 @@ const { botConfig } = require("../../config");
 
 const general = new Composer();
 
+general.start((ctx, next) => {
+  const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
+  const isAdmin = ctx.Helper.isAdmin(chatID);
+
+  if (ctx.chat.type === "private" && !isAdmin) {
+    ctx.reply("Hi!");
+  } else if (isAdmin) {
+    next(ctx);
+  } else {
+    ctx.reply("This command is only available in private chat!");
+  }
+});
+
 general.command("/karmame", async ctx => {
   const CURRENT_MONTH = moment().format("MMMM");
   const chatID = ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
