@@ -86,6 +86,43 @@ const botHelper = {
       });
   },
 
+  telegramIDResolver: (Database, telegramID) => {
+    return Database.ref(MTProtoConfig.sessionPath)
+      .once("value")
+      .then(response => response.val())
+      .then(({ DContacts }) => {
+        return DContacts.find(DContact => {
+          return telegramID === DContact.id;
+        });
+      });
+  },
+
+  getAllKarma: async Database => {
+    const CURRENT_MONTH = moment().format("MMMM");
+
+    const allKarma = (await Database.ref(
+      `${botConfig.karmaPath}/${CURRENT_MONTH}/`
+    ).once("value")).val();
+
+    const sorted = Object.entries(allKarma).sort((a, b) => {
+      if (a[1] > b[1]) return -1;
+      if (a[1] < b[1]) return 1;
+    });
+
+    const topMessage = sorted.map(async user => {
+      const { username } = await botHelper.telegramIDResolver(
+        Database,
+        Number(user[0])
+      );
+
+      if (username != null) {
+        return `@${username}: ${user[1]}\n`;
+      }
+    });
+
+    return await Promise.all(topMessage);
+  },
+
   DGroups: async (ctx, command, skip) => {
     let { DGroups } = (await ctx.Database.ref(MTProtoConfig.sessionPath).once(
       "value"

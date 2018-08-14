@@ -29,9 +29,16 @@ bot.context.Database = database;
 bot.context.Helper = botHelper;
 bot.context.MTProto = MTProto;
 
+// To-Do complete monthlyInformer!
 const monthlyInformer = new CronJob({
-  cronTime: "* * * * * *",
-  onTick: () => {
+  cronTime: "0 30 8 1 * *",
+  onTick: async () => {
+    const allKarma = await ctx.Helper.getAllKarma(ctx.Database);
+
+    const allUsers = (await ctx.Database.ref(
+      `${MTProtoConfig.sessionPath}/DContacts/`
+    ).once("value")).val();
+
     console.log(moment().format("MMMM"));
   },
   start: false
