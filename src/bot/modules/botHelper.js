@@ -45,35 +45,15 @@ const botHelper = {
     );
   },
 
-  keyboardSwitcher: (keyboard, groupTitle) => {
-    const newKeyboard = keyboard.map(item => {
-      if (item[1] == null) return item;
-
-      const itemTitle = item[1].callback_data.split("@")[1];
-
-      if (itemTitle === groupTitle) {
-        const editedItem = item;
-
-        editedItem[1] = {
-          text: editedItem[1].text === "❌" ? "✅" : "❌",
-          callback_data: editedItem[1].callback_data,
-          hide: false
-        };
-
-        return editedItem;
-      }
-
-      return item;
-    });
-
-    newKeyboard.push([
-      {
-        text: "Save and Add ✨",
-        callback_data: "add"
-      }
-    ]);
-
-    return newKeyboard;
+  shareContact: (ctx, msgText) => {
+    return ctx.reply(
+      msgText,
+      Extra.HTML().markup(
+        Markup.oneTime()
+          .keyboard([Markup.contactRequestButton("Send contact")])
+          .resize()
+      )
+    );
   },
 
   usernameResolver: (Database, username) => {
@@ -82,7 +62,7 @@ const botHelper = {
       .then(response => response.val())
       .then(({ DContacts }) => {
         return DContacts.find(DContact => {
-          return username === DContact.username;
+          return username.toLowerCase() === DContact.username.toLowerCase();
         });
       });
   },
@@ -122,6 +102,37 @@ const botHelper = {
     });
 
     return await Promise.all(topMessage);
+  },
+
+  keyboardSwitcher: (keyboard, groupTitle) => {
+    const newKeyboard = keyboard.map(item => {
+      if (item[1] == null) return item;
+
+      const itemTitle = item[1].callback_data.split("@")[1];
+
+      if (itemTitle === groupTitle) {
+        const editedItem = item;
+
+        editedItem[1] = {
+          text: editedItem[1].text === "❌" ? "✅" : "❌",
+          callback_data: editedItem[1].callback_data,
+          hide: false
+        };
+
+        return editedItem;
+      }
+
+      return item;
+    });
+
+    newKeyboard.push([
+      {
+        text: "Save and Add ✨",
+        callback_data: "add"
+      }
+    ]);
+
+    return newKeyboard;
   },
 
   DGroups: async (ctx, command, skip) => {
@@ -323,12 +334,14 @@ const botHelper = {
   },
 
   isAdmin: chatID => {
-    const result = botConfig.admins.find(admin => {
-      return admin === chatID;
-    });
+    const result = botConfig.admins.find(admin => admin === chatID);
 
     if (result) return true;
     else return false;
+  },
+
+  getChatID: ctx => {
+    return ctx.chat.id < 0 ? ctx.message.from.id : ctx.chat.id;
   },
 
   toAllAdmins: (ctx, msgText) => {
