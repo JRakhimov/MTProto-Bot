@@ -1,14 +1,11 @@
 const Composer = require("telegraf/composer");
 
+const { adminMiddleware } = require("../modules/middlewares");
 const { MTProtoConfig } = require("../../config");
 
 const admin = new Composer();
 
-admin.use((ctx, next) => {
-  if (ctx.chat.type === "private") {
-    return next(ctx);
-  }
-});
+admin.use(adminMiddleware());
 
 admin.start(ctx => {
   ctx.Helper.mainKeyboard(ctx, "Here is available commands:");
