@@ -4,6 +4,11 @@ const Composer = require("telegraf/composer");
 
 const saveNumber = new Composer();
 
+saveNumber.hears("leave", ctx => {
+  ctx.reply("Leaving from scene...");
+  return ctx.scene.leave();
+});
+
 saveNumber.on("text", async ctx => {
   if (
     ctx.message.entities != null &&
