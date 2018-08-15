@@ -17,6 +17,9 @@ addContactScene.on("contact", async ctx => {
     ctx.replyWithHTML(
       `Contact <code>${users[0].first_name}</code> successfully saved ✨`
     );
+
+    ctx.Helper.DContactsUpdate(ctx.Database, ctx.MTProto);
+
     return ctx.scene.leave();
   }
 });
